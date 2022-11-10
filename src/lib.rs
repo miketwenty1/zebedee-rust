@@ -1,5 +1,3 @@
-use charges::{create_charge, Charge};
-
 pub mod charges;
 pub mod payments;
 pub mod wallet;
