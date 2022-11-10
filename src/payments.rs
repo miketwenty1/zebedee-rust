@@ -37,10 +37,10 @@ pub struct PaymentsRes {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Payment {
-    description: String,
+    pub description: String,
     #[serde(rename = "internalId")]
-    internal_id: String,
-    invoice: String,
+    pub internal_id: String,
+    pub invoice: String,
 }
 
 impl Default for Payment {

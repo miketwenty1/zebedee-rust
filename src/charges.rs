@@ -46,13 +46,13 @@ pub struct ChargesRes {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Charge {
     #[serde(rename = "expiresIn")]
-    expires_in: u32,
-    amount: String,
-    description: String,
+    pub expires_in: u32,
+    pub amount: String,
+    pub description: String,
     #[serde(rename = "internalId")]
-    internal_id: String,
+    pub internal_id: String,
     #[serde(rename = "callbackUrl")]
-    callback_url: String,
+    pub callback_url: String,
 }
 
 impl Default for Charge {

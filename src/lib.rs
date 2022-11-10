@@ -1,3 +1,5 @@
+use charges::{create_charge, Charge};
+
 pub mod charges;
 pub mod payments;
 pub mod wallet;
@@ -16,4 +18,14 @@ impl ZebedeeClient {
             apikey,
         }
     }
+}
+
+pub fn main() {
+    let apikey = String::from("asdfasdfasd");
+    let zebedee_client = ZebedeeClient::new(apikey);
+    let charge = Charge {
+        ..Default::default()
+    };
+    let c = create_charge(zebedee_client, charge);
+    println!("{:?}", c)
 }
