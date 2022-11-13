@@ -1,4 +1,5 @@
 pub mod charges;
+pub mod gamertag;
 pub mod ln_address;
 pub mod payments;
 pub mod wallet;

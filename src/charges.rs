@@ -56,7 +56,7 @@ pub struct Charge {
 }
 
 impl Default for Charge {
-    fn default() -> Charge {
+    fn default() -> Self {
         Charge {
             expires_in: 300,
             amount: String::from("0"),
