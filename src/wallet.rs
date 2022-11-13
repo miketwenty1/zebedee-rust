@@ -1,6 +1,5 @@
 use crate::ZebedeeClient;
 use anyhow::Result;
-//use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
