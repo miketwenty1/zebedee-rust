@@ -1,4 +1,5 @@
 pub mod charges;
+pub mod ln_address;
 pub mod payments;
 pub mod wallet;
 pub mod withdrawal_request;
@@ -17,3 +18,8 @@ impl ZebedeeClient {
         }
     }
 }
+
+// TODO: generic way to resolve API requests and handle errors without losing the ability to parse specific types in the response.
+// pub fn resolve_api_request<T>(response: T) {
+
+// }

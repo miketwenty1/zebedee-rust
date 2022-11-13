@@ -12,3 +12,5 @@ tokio = { version = "1", features = ["full"] }
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde", "rustc-serialize"] }
+http = "0.2"
+validator = { version = "0.16", features = ["derive"] }

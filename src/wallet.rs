@@ -1,5 +1,6 @@
 use crate::ZebedeeClient;
 use anyhow::Result;
+//use reqwest::StatusCode;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -15,8 +16,7 @@ pub struct WalletRes {
 }
 
 #[tokio::main]
-//pub async fn wallet_details(client: Client, apikey: &str) -> Result<WalletRes, anyhow::Error> {
-pub async fn wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyhow::Error> {
+pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyhow::Error> {
     let url = String::from("https://api.zebedee.io/v0/wallet");
     let resp = client
         .reqw_cli
@@ -27,20 +27,17 @@ pub async fn wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyhow::
         .await?;
 
     let status_code = resp.status();
-
+    let status_success = resp.status().is_success();
     let resp_text = resp.text().await?;
 
-    match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
-        s => {
-            return Err(anyhow::anyhow!(
-                "Error: status {}, message: {}, url: {}",
-                s,
-                resp_text.clone(),
-                &url,
-            ));
-        }
-    };
+    if !status_success {
+        return Err(anyhow::anyhow!(
+            "Error: status {}, message: {}, url: {}",
+            status_code,
+            resp_text.clone(),
+            &url,
+        ));
+    }
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
@@ -71,7 +68,7 @@ mod tests {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
         let any_balance = 0..u64::MAX;
-        let r = wallet_details(zebedee_client).unwrap().data.balance;
+        let r = get_wallet_details(zebedee_client).unwrap().data.balance;
         let r2: u64 = r.parse().unwrap();
         assert!(any_balance.contains(&r2));
     }

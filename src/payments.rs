@@ -12,7 +12,7 @@ pub struct PaymentsData {
     invoice: String,
     preimage: Option<String>,
     #[serde(rename = "internalId")]
-    internal_id: String,
+    internal_id: Option<String>,
     #[serde(rename = "processedAt")]
     processed_at: Option<DateTime<Utc>>,
     #[serde(rename = "confirmedAt")]
