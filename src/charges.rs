@@ -4,43 +4,43 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
-struct InvoiceData {
-    request: String,
-    uri: String,
+pub struct InvoiceData {
+    pub request: String,
+    pub uri: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChargesData {
-    id: String, //uuid::Uuid,
-    unit: String,
-    amount: String,
+    pub id: String, //uuid::Uuid,
+    pub unit: String,
+    pub amount: String,
     #[serde(rename = "createdAt")]
-    created_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
     #[serde(rename = "internalId")]
-    internal_id: String,
+    pub internal_id: String,
     #[serde(rename = "callbackUrl")]
-    callback_url: String,
-    description: String,
+    pub callback_url: String,
+    pub description: String,
     #[serde(rename = "expiresAt")]
-    expires_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
     #[serde(rename = "confirmedAt")]
-    confirmed_at: Option<DateTime<Utc>>,
-    status: String,
-    invoice: InvoiceData,
+    pub confirmed_at: Option<DateTime<Utc>>,
+    pub status: String,
+    pub invoice: InvoiceData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllChargesRes {
-    success: bool,
-    data: Vec<ChargesData>,
-    message: String,
+    pub success: bool,
+    pub data: Vec<ChargesData>,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChargesRes {
-    success: bool,
-    data: ChargesData,
-    message: String,
+    pub success: bool,
+    pub data: ChargesData,
+    pub message: String,
 }
 
 /// Use this struct to create a well crafted json body for your charge requests

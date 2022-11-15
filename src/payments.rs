@@ -5,33 +5,33 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaymentsData {
-    id: String,
-    fee: Option<String>,
-    unit: String,
-    amount: String,
-    invoice: Option<String>,
-    preimage: Option<String>,
+    pub id: String,
+    pub fee: Option<String>,
+    pub unit: String,
+    pub amount: String,
+    pub invoice: Option<String>,
+    pub preimage: Option<String>,
     #[serde(rename = "internalId")]
-    internal_id: Option<String>,
+    pub internal_id: Option<String>,
     #[serde(rename = "processedAt")]
-    processed_at: Option<DateTime<Utc>>,
+    pub processed_at: Option<DateTime<Utc>>,
     #[serde(rename = "confirmedAt")]
-    confirmed_at: Option<DateTime<Utc>>,
-    description: String,
-    status: String,
+    pub confirmed_at: Option<DateTime<Utc>>,
+    pub description: String,
+    pub status: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllPaymentsRes {
-    success: bool,
-    data: Vec<PaymentsData>,
-    message: String,
+    pub success: bool,
+    pub data: Vec<PaymentsData>,
+    pub message: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaymentsRes {
-    success: bool,
-    data: PaymentsData,
-    message: String,
+    pub success: bool,
+    pub data: PaymentsData,
+    pub message: String,
 }
 
 /// Use this struct to create a well crafted json body for normal ligthning bolt 11 payments

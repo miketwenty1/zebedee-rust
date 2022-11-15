@@ -5,50 +5,50 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InvoiceData {
-    request: String,
+    pub request: String,
     #[serde(rename = "fastRequest")]
-    fast_request: String,
-    uri: String,
+    pub fast_request: String,
+    pub uri: String,
     #[serde(rename = "fastUri")]
-    fast_uri: String,
+    pub fast_uri: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalRequestsData {
-    id: String,
-    unit: String,
-    amount: String,
+    pub id: String,
+    pub unit: String,
+    pub amount: String,
     #[serde(rename = "createdAt")]
-    created_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
     #[serde(rename = "expiresAt")]
-    expires_at: DateTime<Utc>,
+    pub expires_at: DateTime<Utc>,
     #[serde(rename = "internalId")]
-    internal_id: String,
-    description: String,
+    pub internal_id: String,
+    pub description: String,
     #[serde(rename = "callbackUrl")]
-    callback_url: String,
-    status: String,
-    invoice: InvoiceData,
+    pub callback_url: String,
+    pub status: String,
+    pub invoice: InvoiceData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllWithdrawalRequestsRes {
-    message: String,
-    data: Vec<WithdrawalRequestsData>,
+    pub message: String,
+    pub data: Vec<WithdrawalRequestsData>,
     // weird this doesn't have a success
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetWithdrawalRequestsRes {
-    data: WithdrawalRequestsData,
-    message: String,
+    pub data: WithdrawalRequestsData,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostWithdrawalRequestsRes {
-    success: bool,
-    data: WithdrawalRequestsData,
-    message: String,
+    pub success: bool,
+    pub data: WithdrawalRequestsData,
+    pub message: String,
 }
 
 /// Use this struct to create a well crafted json body for withdrawal requests

@@ -4,42 +4,42 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetBtcUsdRes {
-    success: bool,
-    data: BtcUsdData,
-    message: String,
+    pub success: bool,
+    pub data: BtcUsdData,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BtcUsdData {
     #[serde(rename = "btcUsdPrice")]
-    btc_usd_price: String,
+    pub btc_usd_price: String,
     #[serde(rename = "btcUsdTimestamp")]
-    btc_usd_timestamp: String,
+    pub btc_usd_timestamp: String,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetProdIpsRes {
-    success: bool,
-    data: IpData,
+    pub success: bool,
+    pub data: IpData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IpData {
-    ips: Vec<String>,
+    pub ips: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetIsSupportedRegionByIpRes {
-    success: bool,
-    data: RegionIpData,
-    message: String,
+    pub success: bool,
+    pub data: RegionIpData,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RegionIpData {
     #[serde(rename = "ipAddress")]
-    ip_address: String,
+    pub ip_address: String,
     #[serde(rename = "isSupported")]
-    is_supported: bool,
+    pub is_supported: bool,
 }
 
 #[tokio::main]

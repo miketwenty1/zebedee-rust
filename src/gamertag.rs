@@ -8,35 +8,35 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagUserIdRes {
-    success: bool,
-    data: HashMap<String, String>,
+    pub success: bool,
+    pub data: HashMap<String, String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagPaymentRes {
-    success: bool,
-    data: GamertagPaymentData,
-    message: String,
+    pub success: bool,
+    pub data: GamertagPaymentData,
+    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagPaymentData {
     #[serde(rename = "receiverId")]
-    receiver_id: String,
+    pub receiver_id: String,
     #[serde(rename = "transactionId")]
-    transaction_id: String,
-    amount: String,
-    comment: String,
+    pub transaction_id: String,
+    pub amount: String,
+    pub comment: String,
 }
 
 /// Use this struct to create a well crafted json body for your gamertag payments
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct GamertagPayment {
     #[validate(length(min = 1))]
-    gamertag: String,
+    pub gamertag: String,
     #[validate(length(min = 4))]
-    amount: String,
-    description: String,
+    pub amount: String,
+    pub description: String,
 }
 impl Default for GamertagPayment {
     fn default() -> Self {
@@ -50,46 +50,46 @@ impl Default for GamertagPayment {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagChargeRes {
-    success: bool,
-    data: GamertagChargeData,
+    pub success: bool,
+    pub data: GamertagChargeData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagChargeData {
     #[serde(rename = "invoiceRequest")]
-    invoice_request: String,
+    pub invoice_request: String,
     #[serde(rename = "invoiceExpiresAt")]
-    invoice_expires_at: DateTime<Utc>,
-    unit: String,
+    pub invoice_expires_at: DateTime<Utc>,
+    pub unit: String,
     #[serde(rename = "createdAt")]
-    created_at: DateTime<Utc>,
-    status: String,
+    pub created_at: DateTime<Utc>,
+    pub status: String,
     #[serde(rename = "internalId")]
-    internal_id: Option<String>,
-    amount: String,
-    description: String,
+    pub internal_id: Option<String>,
+    pub amount: String,
+    pub description: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagTxRes {
-    success: bool,
-    data: GamertagTxData,
+    pub success: bool,
+    pub data: GamertagTxData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagTxData {
-    id: String,
+    pub id: String,
     #[serde(rename = "receiverId")]
-    receiver_id: String,
-    amount: String,
-    fee: String,
-    unit: String,
+    pub receiver_id: String,
+    pub amount: String,
+    pub fee: String,
+    pub unit: String,
     #[serde(rename = "processedAt")]
-    processed_at: Option<DateTime<Utc>>,
+    pub processed_at: Option<DateTime<Utc>>,
     #[serde(rename = "confirmedAt")]
-    confirmed_at: Option<DateTime<Utc>>,
-    comment: String,
-    status: String,
+    pub confirmed_at: Option<DateTime<Utc>>,
+    pub comment: String,
+    pub status: String,
 }
 
 #[tokio::main]

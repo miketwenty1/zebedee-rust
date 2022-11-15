@@ -8,95 +8,95 @@ use validator::Validate;
 #[derive(Debug, Validate, Deserialize)]
 pub struct LnAddress {
     #[validate(email)]
-    address: String,
+    pub address: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnPayerData {
-    name: HashMap<String, bool>,
-    identifier: HashMap<String, bool>,
+    pub name: HashMap<String, bool>,
+    pub identifier: HashMap<String, bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnValidateMetadata {
     #[serde(rename = "minSendable")]
-    min_sendable: u64,
+    pub min_sendable: u64,
     #[serde(rename = "maxSendable")]
-    max_sendable: u64,
+    pub max_sendable: u64,
     #[serde(rename = "commentAllowed")]
-    comment_allowed: u64,
-    tag: String,
-    metadata: String,
-    callback: String,
+    pub comment_allowed: u64,
+    pub tag: String,
+    pub metadata: String,
+    pub callback: String,
     #[serde(rename = "payerData")]
-    payer_data: LnPayerData,
-    disposable: bool,
+    pub payer_data: LnPayerData,
+    pub disposable: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnValidateData {
-    valid: bool,
-    metadata: LnValidateMetadata,
+    pub valid: bool,
+    pub metadata: LnValidateMetadata,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnValidateRes {
-    success: bool,
-    data: LnValidateData,
+    pub success: bool,
+    pub data: LnValidateData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnFetchChargeRes {
-    success: bool,
-    data: LnFetchChargeData,
+    pub success: bool,
+    pub data: LnFetchChargeData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnInvoice {
-    uri: String,
-    request: String,
+    pub uri: String,
+    pub request: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnFetchChargeData {
     #[serde(rename = "lnaddress")]
-    ln_address: String,
-    amount: String,
-    invoice: LnInvoice,
+    pub ln_address: String,
+    pub amount: String,
+    pub invoice: LnInvoice,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnSendPaymentData {
-    id: String,
-    fee: Option<String>,
-    unit: String,
-    amount: String,
-    preimage: Option<String>,
-    status: String,
-    invoice: String,
+    pub id: String,
+    pub fee: Option<String>,
+    pub unit: String,
+    pub amount: String,
+    pub preimage: Option<String>,
+    pub status: String,
+    pub invoice: String,
     #[serde(rename = "walletId")]
-    wallet_id: String,
+    pub wallet_id: String,
     #[serde(rename = "transactionId")]
-    transaction_id: String,
+    pub transaction_id: String,
     #[serde(rename = "createdAt")]
-    created_at: DateTime<Utc>,
+    pub created_at: DateTime<Utc>,
     #[serde(rename = "processedAt")]
-    processed_at: DateTime<Utc>,
+    pub processed_at: DateTime<Utc>,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnSendPaymentRes {
-    success: bool,
-    data: LnSendPaymentData,
-    message: String,
+    pub success: bool,
+    pub data: LnSendPaymentData,
+    pub message: String,
 }
 
 /// Use this struct to create a well crafted json body for your Lightning Address payments
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnPayment {
     #[serde(rename = "lnAddress")]
-    ln_address: String,
-    amount: String,
-    comment: String,
+    pub ln_address: String,
+    pub amount: String,
+    pub comment: String,
 }
 
 impl Default for LnPayment {
@@ -113,9 +113,9 @@ impl Default for LnPayment {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnFetchCharge {
     #[serde(rename = "lnaddress")]
-    ln_address: String,
-    amount: String,
-    description: String,
+    pub ln_address: String,
+    pub amount: String,
+    pub description: String,
 }
 
 impl Default for LnFetchCharge {

@@ -5,34 +5,34 @@ use serde::{Deserialize, Serialize};
 use validator::Validate;
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FetchPostRes {
-    access_token: String,
-    token_type: String,
-    expires_in: u32,
-    refresh_token: String,
-    scope: String,
+    pub access_token: String,
+    pub token_type: String,
+    pub expires_in: u32,
+    pub refresh_token: String,
+    pub scope: String,
 }
 
 #[derive(Clone, Validate, Deserialize, Debug)]
 struct AuthURL {
     #[validate(url)]
-    url: String,
+    pub url: String,
 }
 
 /// Use this struct to create a well crafted json body for token management with ZBD Oauth
 #[derive(Serialize, Validate, Deserialize, Debug)]
 pub struct FetchPost {
     #[validate(length(equal = 36))]
-    client_id: String,
+    pub client_id: String,
     #[validate(length(equal = 36))]
-    client_secret: String,
+    pub client_secret: String,
     #[validate(length(equal = 36))]
-    code: String,
+    pub code: String,
     #[validate(length(equal = 43))]
-    code_verifier: String,
+    pub code_verifier: String,
     #[validate(length(min = 1))]
-    grant_type: String,
+    pub grant_type: String,
     #[validate(url)]
-    redirect_uri: String,
+    pub redirect_uri: String,
 }
 
 impl FetchPost {
@@ -52,15 +52,15 @@ impl FetchPost {
 #[derive(Serialize, Validate, Deserialize, Debug)]
 pub struct FetchRefresh {
     #[validate(length(equal = 36))]
-    client_id: String,
+    pub client_id: String,
     #[validate(length(equal = 36))]
-    client_secret: String,
+    pub client_secret: String,
     #[validate(length(equal = 36))]
-    refresh_token: String,
+    pub refresh_token: String,
     #[validate(length(min = 1))]
-    grant_type: String,
+    pub grant_type: String,
     #[validate(url)]
-    redirect_uri: String,
+    pub redirect_uri: String,
 }
 
 impl FetchRefresh {
@@ -77,23 +77,23 @@ impl FetchRefresh {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FetchUserRes {
-    success: bool,
-    data: FetchUserData,
+    pub success: bool,
+    pub data: FetchUserData,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FetchUserData {
-    id: String,
-    email: String,
-    gamertag: String,
-    image: String,
+    pub id: String,
+    pub email: String,
+    pub gamertag: String,
+    pub image: String,
     #[serde(rename = "isVerified")]
-    is_verified: bool,
+    pub is_verified: bool,
     #[serde(rename = "lightningAddress")]
-    lightning_address: String,
+    pub lightning_address: String,
     #[serde(rename = "publicBio")]
-    public_bio: String,
+    pub public_bio: String,
     #[serde(rename = "publicStaticCharge")]
-    public_static_charge: String,
+    pub public_static_charge: String,
 }
 
 #[tokio::main]

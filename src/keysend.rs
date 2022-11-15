@@ -5,92 +5,92 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysendRes {
-    success: bool,
-    data: KeysendData,
+    pub success: bool,
+    pub data: KeysendData,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysendTx {
-    fee: String,
-    amount: String,
-    status: String,
+    pub fee: String,
+    pub amount: String,
+    pub status: String,
     #[serde(rename = "totalAmount")]
-    total_amount: String,
+    pub total_amount: String,
     #[serde(rename = "updatedAt")]
-    updated_at: DateTime<Utc>,
-    id: String,
+    pub updated_at: DateTime<Utc>,
+    pub id: String,
     #[serde(rename = "walletId")]
-    wallet_id: String,
-    r#type: String,
-    invoice: Option<String>,
+    pub wallet_id: String,
+    pub r#type: String,
+    pub invoice: Option<String>,
     #[serde(rename = "confirmedAt")]
-    confirmed_at: Option<String>,
-    description: String,
-    flow: String,
-    created_at: DateTime<Utc>,
+    pub confirmed_at: Option<String>,
+    pub description: String,
+    pub flow: String,
+    pub created_at: DateTime<Utc>,
     #[serde(rename = "totalAmountUsd")]
-    total_amount_usd: String,
+    pub total_amount_usd: String,
     #[serde(rename = "invoiceRequest")]
-    invoice_request: Option<String>,
+    pub invoice_request: Option<String>,
     #[serde(rename = "invoiceExpiresAt")]
-    invoice_expires_at: Option<String>,
+    pub invoice_expires_at: Option<String>,
     #[serde(rename = "invoiceId")]
-    invoice_id: Option<String>,
-    unit: String,
-    apikey: String,
+    pub invoice_id: Option<String>,
+    pub unit: String,
+    pub apikey: String,
     #[serde(rename = "entityId")]
-    entity_d: String,
+    pub entity_d: String,
     #[serde(rename = "createdAt")]
-    created_at2: DateTime<Utc>,
+    pub created_at2: DateTime<Utc>,
     #[serde(rename = "staticChargeComment")]
-    static_charge_comment: Option<String>,
+    pub static_charge_comment: Option<String>,
     #[serde(rename = "staticChargeId")]
-    static_charge_id: Option<String>,
+    pub static_charge_id: Option<String>,
     #[serde(rename = "peerPaymentId")]
-    peer_payment_id: Option<String>,
+    pub peer_payment_id: Option<String>,
     #[serde(rename = "peerPaymentComment")]
-    peer_payment_comment: Option<String>,
+    pub peer_payment_comment: Option<String>,
     #[serde(rename = "peerPaymentCounterpartyId")]
-    peer_payment_counterparty_id: Option<String>,
+    pub peer_payment_counterparty_id: Option<String>,
     #[serde(rename = "peerPaymentImage")]
-    peer_payment_image: Option<String>,
+    pub peer_payment_image: Option<String>,
     #[serde(rename = "systemTopUpAdminId")]
-    system_top_up_admin_id: Option<String>,
+    pub system_top_up_admin_id: Option<String>,
     #[serde(rename = "sourceApp")]
-    source_app: String,
+    pub source_app: String,
     #[serde(rename = "sourceCity")]
-    source_city: String,
+    pub source_city: String,
     #[serde(rename = "sourceCountry")]
-    source_country: String,
+    pub source_country: String,
     #[serde(rename = "sourceIP")]
-    source_ip: String,
+    pub source_ip: String,
     #[serde(rename = "sourceRegion")]
-    source_region: String,
+    pub source_region: String,
     #[serde(rename = "claimedTransactionId")]
-    claimed_transaction_id: Option<String>,
+    pub claimed_transaction_id: Option<String>,
     #[serde(rename = "isInternal")]
-    is_internal: bool,
+    pub is_internal: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysendData {
     #[serde(rename = "keysendId")]
-    keysend_id: String,
+    pub keysend_id: String,
     #[serde(rename = "paymentId")]
-    payment_id: String,
-    transaction: KeysendTx,
+    pub payment_id: String,
+    pub transaction: KeysendTx,
 }
 
 /// Use this struct to create a well crafted json body for your keysend payments
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Keysend {
-    amount: String,
-    pubkey: String,
-    tlv_records: Vec<Option<String>>,
-    metadata: String,
+    pub amount: String,
+    pub pubkey: String,
+    pub tlv_records: Vec<Option<String>>,
+    pub metadata: String,
     #[serde(rename = "callbackUrl")]
-    callback_url: String,
+    pub callback_url: String,
 }
 
 impl Default for Keysend {

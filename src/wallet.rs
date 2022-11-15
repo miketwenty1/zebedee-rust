@@ -4,14 +4,14 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WalletData {
-    unit: String,
-    balance: String,
+    pub unit: String,
+    pub balance: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WalletRes {
-    message: String,
-    data: WalletData,
+    pub message: String,
+    pub data: WalletData,
 }
 
 #[tokio::main]
