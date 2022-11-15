@@ -3,7 +3,6 @@ use crate::ZebedeeClient;
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FetchPostRes {
     access_token: String,
@@ -72,6 +71,27 @@ impl FetchRefresh {
             refresh_token,
         }
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FetchUserRes {
+    success: bool,
+    data: FetchUserData,
+}
+#[derive(Debug, Serialize, Deserialize)]
+pub struct FetchUserData {
+    id: String,
+    email: String,
+    gamertag: String,
+    image: String,
+    #[serde(rename = "isVerified")]
+    is_verified: bool,
+    #[serde(rename = "lightningAddress")]
+    lightning_address: String,
+    #[serde(rename = "publicBio")]
+    public_bio: String,
+    #[serde(rename = "publicStaticCharge")]
+    public_static_charge: String,
 }
 
 #[tokio::main]
@@ -195,6 +215,54 @@ pub async fn refresh_token(
     Ok(resp_seralized_2)
 }
 
+#[tokio::main]
+pub async fn fetch_user_data(
+    client: ZebedeeClient,
+    bearer_token: String,
+) -> Result<FetchUserRes, anyhow::Error> {
+    let mut token_header_string: String = "Bearer ".to_owned();
+    token_header_string.push_str(&bearer_token);
+
+    let url = String::from("https://api.zebedee.io/v0/oauth2/user");
+    let resp = client
+        .reqw_cli
+        .get(&url)
+        .header("Content-Type", "application/json")
+        .header("Authorization", token_header_string)
+        .send()
+        .await?;
+
+    let status_code = resp.status();
+    let status_success = resp.status().is_success();
+    let resp_text = resp.text().await?;
+
+    if !status_success {
+        return Err(anyhow::anyhow!(
+            "Error: status {}, message: {}, url: {}",
+            status_code,
+            resp_text.clone(),
+            &url,
+        ));
+    }
+
+    let resp_serialized = serde_json::from_str(&resp_text);
+
+    let resp_seralized_2 = match resp_serialized {
+        Ok(c) => c,
+        Err(e) => {
+            return Err(anyhow::anyhow!(
+                "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\n url: {}",
+                e,
+                resp_text.clone(),
+                status_code,
+                &url,
+            ))
+        }
+    };
+
+    Ok(resp_seralized_2)
+}
+
 #[cfg(test)]
 mod tests {
     use crate::PKCE;
@@ -279,5 +347,30 @@ mod tests {
             _ => (),
         }
         assert_eq!(i.contains("Error requesting token"), true);
+    }
+    #[test]
+    fn test_fetch_user_data() {
+        let apikey: String = env::var("ZBD_API_KEY").unwrap();
+        let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
+        let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
+        let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+
+        let zebedee_client = ZebedeeClient::new(apikey)
+            .set_oauth(oauth_client_id, oauth_secret, redirect_uri)
+            .unwrap();
+
+        let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
+        let r = fetch_user_data(zebedee_client, fake_refresh_token);
+        let mut i = String::from("");
+        match r {
+            Err(e) => {
+                i = e.to_string();
+                println!("{}", i);
+            }
+            _ => (),
+        }
+
+        assert_eq!(i.contains("Bad token"), true);
+        //assert_eq!(r.unwrap().data.email, "tyler@z.com");
     }
 }
