@@ -66,7 +66,7 @@ mod tests {
     fn test_wallet_details() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
-        let any_balance = 0..u64::MAX;
+        let any_balance = 0..; //u64::MAX;
         let r = get_wallet_details(zebedee_client).unwrap().data.balance;
         let r2: u64 = r.parse().unwrap();
         assert!(any_balance.contains(&r2));

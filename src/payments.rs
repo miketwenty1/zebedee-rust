@@ -9,7 +9,7 @@ pub struct PaymentsData {
     fee: Option<String>,
     unit: String,
     amount: String,
-    invoice: String,
+    invoice: Option<String>,
     preimage: Option<String>,
     #[serde(rename = "internalId")]
     internal_id: Option<String>,

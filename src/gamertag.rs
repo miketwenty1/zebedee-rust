@@ -360,6 +360,7 @@ mod tests {
         let r = pay_gamertag_charge(zebedee_client, payment)
             .unwrap()
             .success;
+
         assert_eq!(r, true);
     }
 

@@ -14,3 +14,7 @@ serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde", "rustc-serialize"] }
 http = "0.2"
 validator = { version = "0.16", features = ["derive"] }
+uuid = "1.2"
+base64-url = "1.4"
+rand = "0.8"
+sha2 = "0.10"

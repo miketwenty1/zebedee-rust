@@ -303,7 +303,6 @@ mod tests {
             amount: String::from("1000"),
             ..Default::default()
         };
-        println!("{:?}", payment);
         let r = fetch_charge_ln_address(zebedee_client, payment)
             .unwrap()
             .success;

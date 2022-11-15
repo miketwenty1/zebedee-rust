@@ -166,7 +166,6 @@ mod tests {
             ..Default::default()
         };
 
-        println!("{:#?}", keysend_payload);
         let r = keysend(zebedee_client, keysend_payload).unwrap().success;
         assert_eq!(r, true);
     }
