@@ -15,6 +15,7 @@ use sha2::{Digest, Sha256};
 use uuid::Uuid;
 use validator::Validate;
 
+/// You need a client for every request. If you want to use login with zbd/oauth2 see the `set_oauth` fn
 #[derive(Clone, Debug)]
 pub struct ZebedeeClient {
     pub reqw_cli: reqwest::Client,
@@ -120,14 +121,3 @@ impl PKCE {
         Self::new(random_bytes)
     }
 }
-// }
-// pub fn initialize_stream(&mut self) {
-//     self.stream = Some(TcpStream::connect("127.0.0.1:34254").unwrap());
-// }
-// pub struct get_32b_secret (s: String) -> Buffer {
-
-// }
-// TODO: generic way to resolve API requests and handle errors without losing the ability to parse specific types in the response.
-// pub fn resolve_api_request<T>(response: T) {
-
-// }

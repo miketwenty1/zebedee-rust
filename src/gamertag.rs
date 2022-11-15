@@ -29,6 +29,7 @@ pub struct GamertagPaymentData {
     comment: String,
 }
 
+/// Use this struct to create a well crafted json body for your gamertag payments
 #[derive(Debug, Serialize, Deserialize, Validate)]
 pub struct GamertagPayment {
     #[validate(length(min = 1))]
@@ -142,7 +143,7 @@ pub async fn pay_gamertag(
 }
 
 #[tokio::main]
-pub async fn pay_gamertag_charge(
+pub async fn request_from_gamertag(
     client: ZebedeeClient,
     payment: GamertagPayment,
 ) -> Result<GamertagChargeRes, anyhow::Error> {
@@ -347,7 +348,7 @@ mod tests {
     }
 
     #[test]
-    fn test_pay_gamertag_charge() {
+    fn test_request_from_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -357,7 +358,7 @@ mod tests {
             ..Default::default()
         };
 
-        let r = pay_gamertag_charge(zebedee_client, payment)
+        let r = request_from_gamertag(zebedee_client, payment)
             .unwrap()
             .success;
 

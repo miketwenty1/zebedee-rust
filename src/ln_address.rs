@@ -90,6 +90,7 @@ pub struct LnSendPaymentRes {
     message: String,
 }
 
+/// Use this struct to create a well crafted json body for your Lightning Address payments
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnPayment {
     #[serde(rename = "lnAddress")]
@@ -108,7 +109,7 @@ impl Default for LnPayment {
     }
 }
 
-// hopefully we can get rid of this and merge it with LnPayments right now we need this because comments/description inconsistency.
+/// Use this struct to create a well crafted json body for creating charges for Ligthning Addresses
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnFetchCharge {
     #[serde(rename = "lnaddress")]

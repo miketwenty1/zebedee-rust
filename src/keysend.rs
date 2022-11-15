@@ -81,6 +81,8 @@ pub struct KeysendData {
     transaction: KeysendTx,
 }
 
+/// Use this struct to create a well crafted json body for your keysend payments
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Keysend {
     amount: String,

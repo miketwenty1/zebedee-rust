@@ -26,7 +26,6 @@ pub struct AllPaymentsRes {
     success: bool,
     data: Vec<PaymentsData>,
     message: String,
-    // weird this doesn't have a success
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaymentsRes {
@@ -35,6 +34,7 @@ pub struct PaymentsRes {
     message: String,
 }
 
+/// Use this struct to create a well crafted json body for normal ligthning bolt 11 payments
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Payment {
     pub description: String,

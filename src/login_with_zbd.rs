@@ -18,6 +18,7 @@ struct AuthURL {
     url: String,
 }
 
+/// Use this struct to create a well crafted json body for token management with ZBD Oauth
 #[derive(Serialize, Validate, Deserialize, Debug)]
 pub struct FetchPost {
     #[validate(length(equal = 36))]
@@ -47,6 +48,7 @@ impl FetchPost {
     }
 }
 
+/// Use this struct to create a well crafted json body for token refreshes with ZBD Oauth
 #[derive(Serialize, Validate, Deserialize, Debug)]
 pub struct FetchRefresh {
     #[validate(length(equal = 36))]

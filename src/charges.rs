@@ -43,6 +43,7 @@ pub struct ChargesRes {
     message: String,
 }
 
+/// Use this struct to create a well crafted json body for your charge requests
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Charge {
     #[serde(rename = "expiresIn")]

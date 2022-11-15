@@ -51,6 +51,7 @@ pub struct PostWithdrawalRequestsRes {
     message: String,
 }
 
+/// Use this struct to create a well crafted json body for withdrawal requests
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalReqest {
     #[serde(rename = "expiresIn")]
