@@ -2,7 +2,11 @@
 name = "zebedee-rust"
 version = "0.0.1"
 edition = "2021"
-
+license = "MIT"
+description = "Utility crate for ZEBEDEE Public API using reqwest"
+readme = "README.md"
+documentation = "https://docs.rs/zebedee-rust"
+repository = "https://github.com/miketwenty1/zebedee-rust/"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
