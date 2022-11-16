@@ -96,7 +96,6 @@ pub struct FetchUserData {
     pub public_static_charge: String,
 }
 
-#[tokio::main]
 pub async fn create_auth_url(
     client: ZebedeeClient,
     challenge: String,
@@ -125,7 +124,6 @@ pub async fn create_auth_url(
     Ok(auth_url)
 }
 
-#[tokio::main]
 pub async fn fetch_token(
     client: ZebedeeClient,
     payload: FetchPost,
@@ -171,7 +169,6 @@ pub async fn fetch_token(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn refresh_token(
     client: ZebedeeClient,
     payload: FetchRefresh,
@@ -217,7 +214,6 @@ pub async fn refresh_token(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn fetch_user_data(
     client: ZebedeeClient,
     bearer_token: String,
@@ -272,8 +268,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_create_challenge_from_string() {
+    #[tokio::test]
+    async fn test_create_challenge_from_string() {
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
 
         assert_eq!(
@@ -281,14 +277,14 @@ mod tests {
             String::from("mBc-M8x_JG5qARgND5Vzx7fPu1EjZlapL_dVg4BjrkU")
         );
     }
-    #[test]
-    fn test_create_challenge_rand() {
+    #[tokio::test]
+    async fn test_create_challenge_rand() {
         let c = PKCE::new_rand();
 
         assert_eq!(c.challenge, c.challenge);
     }
-    #[test]
-    fn test_create_oauth_auth_url() {
+    #[tokio::test]
+    async fn test_create_oauth_auth_url() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
@@ -301,10 +297,10 @@ mod tests {
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
         let r = create_auth_url(zebedee_client, c.challenge.clone());
 
-        assert_eq!(r.is_ok(), true);
+        assert_eq!(r.await.is_ok(), true);
     }
-    #[test]
-    fn test_fetch_token() {
+    #[tokio::test]
+    async fn test_fetch_token() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
@@ -319,7 +315,7 @@ mod tests {
         let fetchbody = FetchPost::new(zebedee_client.clone(), fake_code, c.verifier);
         let r = fetch_token(zebedee_client, fetchbody);
         let mut i = String::from("");
-        match r {
+        match r.await {
             Err(e) => {
                 i = e.to_string();
             }
@@ -327,8 +323,8 @@ mod tests {
         }
         assert_eq!(i.contains("Error validating challenge"), true);
     }
-    #[test]
-    fn test_refresh_token() {
+    #[tokio::test]
+    async fn test_refresh_token() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
@@ -342,7 +338,7 @@ mod tests {
         let fetchbody = FetchRefresh::new(zebedee_client.clone(), fake_refresh_token);
         let r = refresh_token(zebedee_client, fetchbody);
         let mut i = String::from("");
-        match r {
+        match r.await {
             Err(e) => {
                 i = e.to_string();
             }
@@ -350,8 +346,8 @@ mod tests {
         }
         assert_eq!(i.contains("Error requesting token"), true);
     }
-    #[test]
-    fn test_fetch_user_data() {
+    #[tokio::test]
+    async fn test_fetch_user_data() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
@@ -364,7 +360,7 @@ mod tests {
         let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
         let r = fetch_user_data(zebedee_client, fake_refresh_token);
         let mut i = String::from("");
-        match r {
+        match r.await {
             Err(e) => {
                 i = e.to_string();
                 println!("{}", i);

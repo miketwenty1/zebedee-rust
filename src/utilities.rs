@@ -42,7 +42,6 @@ pub struct RegionIpData {
     pub is_supported: bool,
 }
 
-#[tokio::main]
 pub async fn get_is_supported_region_by_ip(
     client: ZebedeeClient,
     ip: String,
@@ -86,7 +85,6 @@ pub async fn get_is_supported_region_by_ip(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow::Error> {
     let url = format!("https://api.zebedee.io/v0/prod-ips");
     let resp = client
@@ -127,7 +125,6 @@ pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_btc_usd(client: ZebedeeClient) -> Result<GetBtcUsdRes, anyhow::Error> {
     let url = format!("https://api.zebedee.io/v0/btcusd");
     let resp = client
@@ -173,33 +170,34 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_get_is_supported_region_by_ip() {
+    #[tokio::test]
+    async fn test_get_is_supported_region_by_ip() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let ip = String::from("3.225.112.64");
 
         let r = get_is_supported_region_by_ip(zebedee_client, ip)
+            .await
             .unwrap()
             .success;
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_get_prod_ips() {
+    #[tokio::test]
+    async fn test_get_prod_ips() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
-        let r = get_prod_ips(zebedee_client).unwrap().success;
+        let r = get_prod_ips(zebedee_client).await.unwrap().success;
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_get_btc_usd() {
+    #[tokio::test]
+    async fn test_get_btc_usd() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
-        let r = get_btc_usd(zebedee_client).unwrap().success;
+        let r = get_btc_usd(zebedee_client).await.unwrap().success;
         assert_eq!(r, true);
     }
 }

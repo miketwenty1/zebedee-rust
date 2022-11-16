@@ -68,7 +68,6 @@ impl Default for Charge {
     }
 }
 
-#[tokio::main]
 pub async fn create_charge(
     client: ZebedeeClient,
     charge: Charge,
@@ -114,7 +113,6 @@ pub async fn create_charge(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow::Error> {
     let resp = client
         .reqw_cli
@@ -155,7 +153,6 @@ pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow:
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_charge(
     client: ZebedeeClient,
     charge_id: String,
@@ -210,8 +207,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_create_charge() {
+    #[tokio::test]
+    async fn test_create_charge() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
         let charge = Charge {
@@ -219,19 +216,19 @@ mod tests {
             ..Default::default()
         };
 
-        let r = create_charge(zebedee_client, charge).unwrap();
+        let r = create_charge(zebedee_client, charge).await.unwrap();
         assert_eq!(r.success, true);
     }
-    #[test]
-    fn test_get_charges() {
+    #[tokio::test]
+    async fn test_get_charges() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
-        let r = get_charges(zebedee_client).unwrap();
+        let r = get_charges(zebedee_client).await.unwrap();
         assert_eq!(r.success, true);
     }
-    #[test]
-    fn test_get_charge() {
+    #[tokio::test]
+    async fn test_get_charge() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -240,8 +237,8 @@ mod tests {
             ..Default::default()
         };
 
-        let r = create_charge(zebedee_client.clone(), charge).unwrap();
-        let r2 = get_charge(zebedee_client, r.data.id).unwrap();
+        let r = create_charge(zebedee_client.clone(), charge).await.unwrap();
+        let r2 = get_charge(zebedee_client, r.data.id).await.unwrap();
         assert_eq!(r2.success, true);
     }
 }

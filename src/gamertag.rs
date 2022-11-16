@@ -92,7 +92,6 @@ pub struct GamertagTxData {
     pub status: String,
 }
 
-#[tokio::main]
 pub async fn pay_gamertag(
     client: ZebedeeClient,
     payment: GamertagPayment,
@@ -142,7 +141,6 @@ pub async fn pay_gamertag(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn request_from_gamertag(
     client: ZebedeeClient,
     payment: GamertagPayment,
@@ -192,7 +190,6 @@ pub async fn request_from_gamertag(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_gamertag_tx(
     client: ZebedeeClient,
     transaction_id: String,
@@ -239,7 +236,6 @@ pub async fn get_gamertag_tx(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_userid_by_gamertag(
     client: ZebedeeClient,
     gamertag: String,
@@ -283,7 +279,6 @@ pub async fn get_userid_by_gamertag(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_gamertag_by_userid(
     client: ZebedeeClient,
     user_id: String,
@@ -332,8 +327,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_pay_gamertag() {
+    #[tokio::test]
+    async fn test_pay_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -343,12 +338,12 @@ mod tests {
             ..Default::default()
         };
 
-        let r = pay_gamertag(zebedee_client, payment).unwrap().success;
+        let r = pay_gamertag(zebedee_client, payment).await.unwrap().success;
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_request_from_gamertag() {
+    #[tokio::test]
+    async fn test_request_from_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -359,46 +354,50 @@ mod tests {
         };
 
         let r = request_from_gamertag(zebedee_client, payment)
+            .await
             .unwrap()
             .success;
 
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_get_gamertag_tx() {
+    #[tokio::test]
+    async fn test_get_gamertag_tx() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let transaction_id = String::from("322294d5-c993-4eef-88a8-8c9de099e16b");
 
         let r = get_gamertag_tx(zebedee_client, transaction_id)
+            .await
             .unwrap()
             .success;
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_get_userid_by_gamertag() {
+    #[tokio::test]
+    async fn test_get_userid_by_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let gamertag = String::from("miketwenty1");
 
         let r = get_userid_by_gamertag(zebedee_client, gamertag)
+            .await
             .unwrap()
             .success;
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_get_gamertag_by_userid() {
+    #[tokio::test]
+    async fn test_get_gamertag_by_userid() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let user_id = String::from("0a872b22-d3e2-46c8-84af-139cce32a4c5");
 
         let r = get_gamertag_by_userid(zebedee_client, user_id)
+            .await
             .unwrap()
             .success;
         assert_eq!(r, true);

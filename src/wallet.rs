@@ -14,7 +14,6 @@ pub struct WalletRes {
     pub data: WalletData,
 }
 
-#[tokio::main]
 pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyhow::Error> {
     let url = String::from("https://api.zebedee.io/v0/wallet");
     let resp = client
@@ -62,12 +61,16 @@ mod tests {
 
     use super::*;
 
-    #[test]
-    fn test_wallet_details() {
+    #[tokio::test]
+    async fn test_wallet_details() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
         let any_balance = 0..; //u64::MAX;
-        let r = get_wallet_details(zebedee_client).unwrap().data.balance;
+        let r = get_wallet_details(zebedee_client)
+            .await
+            .unwrap()
+            .data
+            .balance;
         let r2: u64 = r.parse().unwrap();
         assert!(any_balance.contains(&r2));
     }

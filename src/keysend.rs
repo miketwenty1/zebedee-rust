@@ -105,7 +105,6 @@ impl Default for Keysend {
     }
 }
 
-#[tokio::main]
 pub async fn keysend(
     client: ZebedeeClient,
     keysend_payload: Keysend,
@@ -155,8 +154,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_keysend() {
+    #[tokio::test]
+    async fn test_keysend() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -168,7 +167,10 @@ mod tests {
             ..Default::default()
         };
 
-        let r = keysend(zebedee_client, keysend_payload).unwrap().success;
+        let r = keysend(zebedee_client, keysend_payload)
+            .await
+            .unwrap()
+            .success;
         assert_eq!(r, true);
     }
 }

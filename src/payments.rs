@@ -53,7 +53,6 @@ impl Default for Payment {
     }
 }
 
-#[tokio::main]
 pub async fn pay_invoice(
     client: ZebedeeClient,
     payment: Payment,
@@ -99,7 +98,6 @@ pub async fn pay_invoice(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyhow::Error> {
     let resp = client
         .reqw_cli
@@ -140,7 +138,6 @@ pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyho
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_payment(
     client: ZebedeeClient,
     payment_id: String,
@@ -195,8 +192,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_pay_invoice() {
+    #[tokio::test]
+    async fn test_pay_invoice() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -205,25 +202,25 @@ mod tests {
             ..Default::default()
         };
         // expected to get a 400 error
-        let r = pay_invoice(zebedee_client, payment).err().unwrap();
+        let r = pay_invoice(zebedee_client, payment).await.err().unwrap();
         assert_eq!(r.to_string().contains("400"), true);
     }
-    #[test]
-    fn test_get_payments() {
+    #[tokio::test]
+    async fn test_get_payments() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
-        let r = get_payments(zebedee_client).unwrap();
+        let r = get_payments(zebedee_client).await.unwrap();
         assert_eq!(r.success, true);
     }
-    #[test]
-    fn test_get_payment() {
+    #[tokio::test]
+    async fn test_get_payment() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let payment_id = String::from("5d88b2e0-e491-40e1-a8a8-a81ae68f2297");
 
-        let r = get_payment(zebedee_client, payment_id).err().unwrap();
+        let r = get_payment(zebedee_client, payment_id).await.err().unwrap();
         assert_eq!(r.to_string().contains("404"), true);
     }
 }

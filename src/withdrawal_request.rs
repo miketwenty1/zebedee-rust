@@ -76,7 +76,6 @@ impl Default for WithdrawalReqest {
     }
 }
 
-#[tokio::main]
 pub async fn create_withdrawal_request(
     client: ZebedeeClient,
     withdrawal_request: WithdrawalReqest,
@@ -122,7 +121,6 @@ pub async fn create_withdrawal_request(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_withdrawal_requests(
     client: ZebedeeClient,
 ) -> Result<AllWithdrawalRequestsRes, anyhow::Error> {
@@ -165,7 +163,6 @@ pub async fn get_withdrawal_requests(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn get_withdrawal_request(
     client: ZebedeeClient,
     withdrawal_id: String,
@@ -223,8 +220,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_create_withdrawal_request() {
+    #[tokio::test]
+    async fn test_create_withdrawal_request() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -233,19 +230,21 @@ mod tests {
             ..Default::default()
         };
 
-        let r = create_withdrawal_request(zebedee_client, withdrawal_request).unwrap();
+        let r = create_withdrawal_request(zebedee_client, withdrawal_request)
+            .await
+            .unwrap();
         assert_eq!(r.success, true);
     }
-    #[test]
-    fn test_get_withdrawal_requests() {
+    #[tokio::test]
+    async fn test_get_withdrawal_requests() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
-        let r = get_withdrawal_requests(zebedee_client).unwrap();
+        let r = get_withdrawal_requests(zebedee_client).await.unwrap();
         assert_eq!(r.message.contains("Success"), true);
     }
-    #[test]
-    fn test_get_withdrawal_request() {
+    #[tokio::test]
+    async fn test_get_withdrawal_request() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -254,8 +253,12 @@ mod tests {
             ..Default::default()
         };
 
-        let r = create_withdrawal_request(zebedee_client.clone(), withdrawal_request).unwrap();
-        let r2 = get_withdrawal_request(zebedee_client, r.data.id).unwrap();
+        let r = create_withdrawal_request(zebedee_client.clone(), withdrawal_request)
+            .await
+            .unwrap();
+        let r2 = get_withdrawal_request(zebedee_client, r.data.id)
+            .await
+            .unwrap();
         assert_eq!(r2.message.contains("Success"), true);
     }
 }

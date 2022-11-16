@@ -128,7 +128,6 @@ impl Default for LnFetchCharge {
     }
 }
 
-#[tokio::main]
 pub async fn pay_ln_address(
     client: ZebedeeClient,
     payment: LnPayment,
@@ -173,7 +172,6 @@ pub async fn pay_ln_address(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn fetch_charge_ln_address(
     client: ZebedeeClient,
     payment: LnFetchCharge,
@@ -218,7 +216,6 @@ pub async fn fetch_charge_ln_address(
     Ok(resp_seralized_2)
 }
 
-#[tokio::main]
 pub async fn validate_ln_address(
     client: ZebedeeClient,
     lightning_address: LnAddress,
@@ -281,8 +278,8 @@ mod tests {
     use super::*;
     use std::env;
 
-    #[test]
-    fn test_pay_ln_address() {
+    #[tokio::test]
+    async fn test_pay_ln_address() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -291,11 +288,14 @@ mod tests {
             amount: String::from("1000"),
             ..Default::default()
         };
-        let r = pay_ln_address(zebedee_client, payment).unwrap().success;
+        let r = pay_ln_address(zebedee_client, payment)
+            .await
+            .unwrap()
+            .success;
         assert_eq!(r, true);
     }
-    #[test]
-    fn test_fetch_charge_ln_address() {
+    #[tokio::test]
+    async fn test_fetch_charge_ln_address() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -305,13 +305,14 @@ mod tests {
             ..Default::default()
         };
         let r = fetch_charge_ln_address(zebedee_client, payment)
+            .await
             .unwrap()
             .success;
         assert_eq!(r, true);
     }
 
-    #[test]
-    fn test_validate_ln_address() {
+    #[tokio::test]
+    async fn test_validate_ln_address() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -323,6 +324,7 @@ mod tests {
                 address: ln_address,
             },
         )
+        .await
         .unwrap()
         .success;
         assert_eq!(r, true);
