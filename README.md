@@ -5,7 +5,7 @@
 Cargo.toml:
 ```
 [dependencies]
-zebedee_rust = "0.1.1"
+zebedee_rust = "0.1.2"
 ```
 
 ### Example usage of some of the functions:
@@ -33,16 +33,6 @@ pub fn main() {
     let c = create_charge(zebedee_client.clone(), charge);
     println!("I can send bolt 11 invoice {:#?}", c.unwrap().data.invoice);
 
-    // My friend can't figure out how to pay the bolt 11 invoice but he has the zebedee app so i'll just request he pay me by gamertag.
-
-    let pay_req = GamertagPayment {
-        gamertag: String::from("miketwenty1"),
-        amount: 20_000_000.to_string(),
-        ..Default::default()
-    };
-
-    let result_from_payment_request =
-        request_from_gamertag(zebedee_client.clone(), pay_req).unwrap();
 
     // Let's do a keysend payment
 

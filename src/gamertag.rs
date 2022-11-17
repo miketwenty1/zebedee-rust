@@ -141,7 +141,8 @@ pub async fn pay_gamertag(
     Ok(resp_seralized_2)
 }
 
-pub async fn request_from_gamertag(
+/// Create a bolt 11 invoice so you can pay a specified gamertag
+pub async fn fetch_charge_from_gamertag(
     client: ZebedeeClient,
     payment: GamertagPayment,
 ) -> Result<GamertagChargeRes, anyhow::Error> {
@@ -343,7 +344,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_request_from_gamertag() {
+    async fn test_fetch_charge_from_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
 
@@ -353,7 +354,7 @@ mod tests {
             ..Default::default()
         };
 
-        let r = request_from_gamertag(zebedee_client, payment)
+        let r = fetch_charge_from_gamertag(zebedee_client, payment)
             .await
             .unwrap()
             .success;
