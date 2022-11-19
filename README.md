@@ -5,7 +5,7 @@
 Cargo.toml:
 ```
 [dependencies]
-zebedee_rust = "0.1.2"
+zebedee_rust = "0.1.3"
 ```
 
 ### Example usage of some of the functions:
