@@ -85,7 +85,7 @@ pub struct FetchUserData {
     pub id: String,
     pub email: String,
     pub gamertag: String,
-    pub image: String,
+    pub image: Option<String>,
     #[serde(rename = "isVerified")]
     pub is_verified: bool,
     #[serde(rename = "lightningAddress")]
