@@ -17,7 +17,7 @@ pub struct KeysendTx {
     #[serde(rename = "totalAmount")]
     pub total_amount: String,
     #[serde(rename = "updatedAt")]
-    pub updated_at: DateTime<Utc>,
+    pub updated_at: Option<DateTime<Utc>>,
     pub id: String,
     #[serde(rename = "walletId")]
     pub wallet_id: String,

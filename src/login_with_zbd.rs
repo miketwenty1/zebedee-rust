@@ -111,6 +111,7 @@ pub async fn create_auth_url(
         .query(&[("code_challenge_method", "S256")])
         .query(&[("code_challenge", challenge)])
         .query(&[("scope", "user")])
+        .query(&[("state", client.oauth.state)])
         .build()
         .unwrap()
         .url()
@@ -289,9 +290,10 @@ mod tests {
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
         let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+        let state: String = env::var("ZBD_OAUTH_STATE").unwrap();
 
         let zebedee_client = ZebedeeClient::new(apikey)
-            .set_oauth(oauth_client_id, oauth_secret, redirect_uri)
+            .set_oauth(oauth_client_id, oauth_secret, redirect_uri, state)
             .unwrap();
 
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
@@ -305,9 +307,10 @@ mod tests {
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
         let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+        let state: String = env::var("ZBD_OAUTH_STATE").unwrap();
 
         let zebedee_client = ZebedeeClient::new(apikey)
-            .set_oauth(oauth_client_id, oauth_secret, redirect_uri)
+            .set_oauth(oauth_client_id, oauth_secret, redirect_uri, state)
             .unwrap();
 
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
@@ -329,9 +332,10 @@ mod tests {
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
         let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+        let state: String = env::var("ZBD_OAUTH_STATE").unwrap();
 
         let zebedee_client = ZebedeeClient::new(apikey)
-            .set_oauth(oauth_client_id, oauth_secret, redirect_uri)
+            .set_oauth(oauth_client_id, oauth_secret, redirect_uri, state)
             .unwrap();
 
         let fake_refresh_token = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
@@ -352,9 +356,10 @@ mod tests {
         let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
         let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
         let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+        let state: String = env::var("ZBD_OAUTH_STATE").unwrap();
 
         let zebedee_client = ZebedeeClient::new(apikey)
-            .set_oauth(oauth_client_id, oauth_secret, redirect_uri)
+            .set_oauth(oauth_client_id, oauth_secret, redirect_uri, state)
             .unwrap();
 
         let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");

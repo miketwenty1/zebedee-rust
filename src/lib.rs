@@ -41,6 +41,8 @@ pub struct ZebedeeOauth {
     pub secret: String,
     #[validate(url)]
     pub redirect_uri: String,
+    #[validate(length(equal = 36))]
+    pub state: String,
 }
 
 impl Default for ZebedeeOauth {
@@ -49,6 +51,7 @@ impl Default for ZebedeeOauth {
             client_id: Default::default(),
             secret: Default::default(),
             redirect_uri: Default::default(),
+            state: Default::default(),
         }
     }
 }
@@ -59,14 +62,17 @@ impl ZebedeeClient {
         client_id: String,
         secret: String,
         redirect_uri: String,
+        state: String,
     ) -> Result<Self, anyhow::Error> {
         Uuid::parse_str(&client_id)?;
         Uuid::parse_str(&secret)?;
+        Uuid::parse_str(&state)?;
 
         let zeb_oauth = ZebedeeOauth {
             client_id,
             secret,
             redirect_uri,
+            state,
         };
 
         match zeb_oauth.validate() {

@@ -5,7 +5,7 @@
 Cargo.toml:
 ```
 [dependencies]
-zebedee_rust = "0.1.3"
+zebedee_rust = "0.1.4"
 ```
 
 ### Example usage of some of the functions:
@@ -71,9 +71,10 @@ pub fn main() {
     let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
     let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
     let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+    let state: String = env::var("ZBD_OAUTH_STATE").unwrap();
 
     let zebedee_client = ZebedeeClient::new(apikey)
-        .set_oauth(oauth_client_id, oauth_secret, redirect_uri)
+        .set_oauth(oauth_client_id, oauth_secret, redirect_uri, state)
         .unwrap();
 
     let pkce = PKCE::new_from_string(String::from("hellomynameiswhat"));
