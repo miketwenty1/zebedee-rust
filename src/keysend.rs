@@ -11,65 +11,18 @@ pub struct KeysendRes {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysendTx {
-    pub fee: String,
-    pub amount: String,
-    pub status: String,
-    #[serde(rename = "totalAmount")]
-    pub total_amount: String,
-    #[serde(rename = "updatedAt")]
-    pub updated_at: Option<DateTime<Utc>>,
     pub id: String,
     #[serde(rename = "walletId")]
     pub wallet_id: String,
     pub r#type: String,
-    pub invoice: Option<String>,
-    #[serde(rename = "confirmedAt")]
-    pub confirmed_at: Option<String>,
+    #[serde(rename = "totalAmount")]
+    pub total_amount: String,
+    pub fee: String,
+    pub amount: String,
     pub description: String,
-    pub flow: String,
-    pub created_at: DateTime<Utc>,
-    #[serde(rename = "totalAmountUsd")]
-    pub total_amount_usd: String,
-    #[serde(rename = "invoiceRequest")]
-    pub invoice_request: Option<String>,
-    #[serde(rename = "invoiceExpiresAt")]
-    pub invoice_expires_at: Option<String>,
-    #[serde(rename = "invoiceId")]
-    pub invoice_id: Option<String>,
-    pub unit: String,
-    pub apikey: String,
-    #[serde(rename = "entityId")]
-    pub entity_d: String,
-    #[serde(rename = "createdAt")]
-    pub created_at2: DateTime<Utc>,
-    #[serde(rename = "staticChargeComment")]
-    pub static_charge_comment: Option<String>,
-    #[serde(rename = "staticChargeId")]
-    pub static_charge_id: Option<String>,
-    #[serde(rename = "peerPaymentId")]
-    pub peer_payment_id: Option<String>,
-    #[serde(rename = "peerPaymentComment")]
-    pub peer_payment_comment: Option<String>,
-    #[serde(rename = "peerPaymentCounterpartyId")]
-    pub peer_payment_counterparty_id: Option<String>,
-    #[serde(rename = "peerPaymentImage")]
-    pub peer_payment_image: Option<String>,
-    #[serde(rename = "systemTopUpAdminId")]
-    pub system_top_up_admin_id: Option<String>,
-    #[serde(rename = "sourceApp")]
-    pub source_app: String,
-    #[serde(rename = "sourceCity")]
-    pub source_city: String,
-    #[serde(rename = "sourceCountry")]
-    pub source_country: String,
-    #[serde(rename = "sourceIP")]
-    pub source_ip: String,
-    #[serde(rename = "sourceRegion")]
-    pub source_region: String,
-    #[serde(rename = "claimedTransactionId")]
-    pub claimed_transaction_id: Option<String>,
-    #[serde(rename = "isInternal")]
-    pub is_internal: bool,
+    pub status: String,
+    #[serde(rename = "confirmedAt")]
+    pub confirmed_at: Option<DateTime<Utc>>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -109,7 +62,7 @@ pub async fn keysend(
     client: ZebedeeClient,
     keysend_payload: Keysend,
 ) -> Result<KeysendRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/keysend-payment");
+    let url = "https://api.zebedee.io/v0/keysend-payment".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -127,7 +80,7 @@ pub async fn keysend(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -140,7 +93,7 @@ pub async fn keysend(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -171,6 +124,6 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 }

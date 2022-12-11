@@ -99,7 +99,7 @@ pub async fn create_withdrawal_request(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
                 s,
-                resp_text.clone()
+                resp_text
             ));
         }
     };
@@ -112,7 +112,7 @@ pub async fn create_withdrawal_request(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -141,7 +141,7 @@ pub async fn get_withdrawal_requests(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
                 s,
-                resp_text.clone()
+                resp_text
             ));
         }
     };
@@ -154,7 +154,7 @@ pub async fn get_withdrawal_requests(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -189,7 +189,7 @@ pub async fn get_withdrawal_request(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}, withdrawal_id: {}, url: {}",
                 s,
-                resp_text.clone(),
+                resp_text,
                 withdrawal_id,
                 &url,
             ));
@@ -204,7 +204,7 @@ pub async fn get_withdrawal_request(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\nwithdrawal_requests_id: {}\n url: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code,
                 withdrawal_id,
                 &url,
@@ -233,7 +233,7 @@ mod tests {
         let r = create_withdrawal_request(zebedee_client, withdrawal_request)
             .await
             .unwrap();
-        assert_eq!(r.success, true);
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_withdrawal_requests() {
@@ -241,7 +241,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_withdrawal_requests(zebedee_client).await.unwrap();
-        assert_eq!(r.message.contains("Success"), true);
+        assert!(r.message.contains("Success"));
     }
     #[tokio::test]
     async fn test_get_withdrawal_request() {
@@ -259,6 +259,6 @@ mod tests {
         let r2 = get_withdrawal_request(zebedee_client, r.data.id)
             .await
             .unwrap();
-        assert_eq!(r2.message.contains("Success"), true);
+        assert!(r2.message.contains("Success"));
     }
 }

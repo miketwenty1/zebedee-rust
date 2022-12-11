@@ -76,7 +76,7 @@ pub async fn pay_invoice(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
                 s,
-                resp_text.clone()
+                resp_text
             ));
         }
     };
@@ -89,7 +89,7 @@ pub async fn pay_invoice(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -116,7 +116,7 @@ pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyho
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
                 s,
-                resp_text.clone()
+                resp_text
             ));
         }
     };
@@ -129,7 +129,7 @@ pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyho
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -161,7 +161,7 @@ pub async fn get_payment(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}, payment_id: {}, url: {}",
                 s,
-                resp_text.clone(),
+                resp_text,
                 payment_id,
                 &url,
             ));
@@ -176,7 +176,7 @@ pub async fn get_payment(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\npayment_requests_id: {}\n url: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code,
                 payment_id,
                 &url,
@@ -203,7 +203,7 @@ mod tests {
         };
         // expected to get a 400 error
         let r = pay_invoice(zebedee_client, payment).await.err().unwrap();
-        assert_eq!(r.to_string().contains("400"), true);
+        assert!(r.to_string().contains("400"));
     }
     #[tokio::test]
     async fn test_get_payments() {
@@ -211,7 +211,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_payments(zebedee_client).await.unwrap();
-        assert_eq!(r.success, true);
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_payment() {
@@ -221,6 +221,6 @@ mod tests {
         let payment_id = String::from("5d88b2e0-e491-40e1-a8a8-a81ae68f2297");
 
         let r = get_payment(zebedee_client, payment_id).await.err().unwrap();
-        assert_eq!(r.to_string().contains("404"), true);
+        assert!(r.to_string().contains("404"));
     }
 }

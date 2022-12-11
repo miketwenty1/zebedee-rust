@@ -78,10 +78,10 @@ impl FetchRefresh {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct FetchUserRes {
     pub success: bool,
-    pub data: FetchUserData,
+    pub data: ZBDUserData,
 }
 #[derive(Debug, Serialize, Deserialize)]
-pub struct FetchUserData {
+pub struct ZBDUserData {
     pub id: String,
     pub email: String,
     pub gamertag: String,
@@ -131,7 +131,7 @@ pub async fn fetch_token(
 ) -> Result<FetchPostRes, anyhow::Error> {
     payload.validate()?;
 
-    let url = format!("https://api.zebedee.io/v0/oauth2/token");
+    let url = "https://api.zebedee.io/v0/oauth2/token".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -148,7 +148,7 @@ pub async fn fetch_token(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -161,7 +161,7 @@ pub async fn fetch_token(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -176,7 +176,7 @@ pub async fn refresh_token(
 ) -> Result<FetchPostRes, anyhow::Error> {
     payload.validate()?;
 
-    let url = format!("https://api.zebedee.io/v0/oauth2/token");
+    let url = "https://api.zebedee.io/v0/oauth2/token".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -193,7 +193,7 @@ pub async fn refresh_token(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -206,7 +206,7 @@ pub async fn refresh_token(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -239,7 +239,7 @@ pub async fn fetch_user_data(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -252,7 +252,7 @@ pub async fn fetch_user_data(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\n url: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code,
                 &url,
             ))
@@ -299,7 +299,7 @@ mod tests {
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
         let r = create_auth_url(zebedee_client, c.challenge.clone());
 
-        assert_eq!(r.await.is_ok(), true);
+        assert!(r.await.is_ok());
     }
     #[tokio::test]
     async fn test_fetch_token() {
@@ -317,14 +317,14 @@ mod tests {
         let fake_code = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
         let fetchbody = FetchPost::new(zebedee_client.clone(), fake_code, c.verifier);
         let r = fetch_token(zebedee_client, fetchbody);
-        let mut i = String::from("");
-        match r.await {
-            Err(e) => {
-                i = e.to_string();
-            }
-            _ => (),
-        }
-        assert_eq!(i.contains("Error validating challenge"), true);
+        //let mut i = String::from("");
+        let i = match r.await {
+            Err(e) => e.to_string(),
+
+            Ok(_) => "it worked but how?".to_string(),
+        };
+        println!("{i}");
+        assert!(i.contains("Client not found or not active"));
     }
     #[tokio::test]
     async fn test_refresh_token() {
@@ -341,14 +341,11 @@ mod tests {
         let fake_refresh_token = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
         let fetchbody = FetchRefresh::new(zebedee_client.clone(), fake_refresh_token);
         let r = refresh_token(zebedee_client, fetchbody);
-        let mut i = String::from("");
-        match r.await {
-            Err(e) => {
-                i = e.to_string();
-            }
-            _ => (),
-        }
-        assert_eq!(i.contains("Error requesting token"), true);
+        let i = match r.await {
+            Err(e) => e.to_string(),
+            Ok(_) => "this worked but how?".to_string(),
+        };
+        assert!(i.contains("Client not found or not active"));
     }
     #[tokio::test]
     async fn test_fetch_user_data() {
@@ -364,16 +361,10 @@ mod tests {
 
         let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
         let r = fetch_user_data(zebedee_client, fake_refresh_token);
-        let mut i = String::from("");
-        match r.await {
-            Err(e) => {
-                i = e.to_string();
-                println!("{}", i);
-            }
-            _ => (),
-        }
-
-        assert_eq!(i.contains("Bad token"), true);
-        //assert_eq!(r.unwrap().data.email, "tyler@z.com");
+        let i = match r.await {
+            Err(e) => e.to_string(),
+            Ok(_) => "was a good token but it shouldnt be".to_string(),
+        };
+        assert!(i.contains("Bad token"));
     }
 }

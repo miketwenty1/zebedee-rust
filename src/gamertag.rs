@@ -101,7 +101,7 @@ pub async fn pay_gamertag(
         Err(e) => return Err(anyhow::anyhow!("Bad Gamertag Payment format {}", e)),
     };
 
-    let url = format!("https://api.zebedee.io/v0/gamertag/send-payment");
+    let url = "https://api.zebedee.io/v0/gamertag/send-payment".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -119,7 +119,7 @@ pub async fn pay_gamertag(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -132,7 +132,7 @@ pub async fn pay_gamertag(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -151,7 +151,7 @@ pub async fn fetch_charge_from_gamertag(
         Err(e) => return Err(anyhow::anyhow!("Bad data your payload: {}", e)),
     };
 
-    let url = format!("https://api.zebedee.io/v0/gamertag/charges");
+    let url = "https://api.zebedee.io/v0/gamertag/charges".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -169,7 +169,7 @@ pub async fn fetch_charge_from_gamertag(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -182,7 +182,7 @@ pub async fn fetch_charge_from_gamertag(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -215,7 +215,7 @@ pub async fn get_gamertag_tx(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -228,7 +228,7 @@ pub async fn get_gamertag_tx(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -258,7 +258,7 @@ pub async fn get_userid_by_gamertag(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -271,7 +271,7 @@ pub async fn get_userid_by_gamertag(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -301,7 +301,7 @@ pub async fn get_gamertag_by_userid(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -314,7 +314,7 @@ pub async fn get_gamertag_by_userid(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -340,7 +340,7 @@ mod tests {
         };
 
         let r = pay_gamertag(zebedee_client, payment).await.unwrap().success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -359,7 +359,7 @@ mod tests {
             .unwrap()
             .success;
 
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -373,7 +373,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -387,7 +387,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -401,6 +401,6 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 }

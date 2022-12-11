@@ -132,7 +132,7 @@ pub async fn pay_ln_address(
     client: ZebedeeClient,
     payment: LnPayment,
 ) -> Result<LnSendPaymentRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/ln-address/send-payment");
+    let url = "https://api.zebedee.io/v0/ln-address/send-payment".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -150,7 +150,7 @@ pub async fn pay_ln_address(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -163,7 +163,7 @@ pub async fn pay_ln_address(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -176,7 +176,7 @@ pub async fn fetch_charge_ln_address(
     client: ZebedeeClient,
     payment: LnFetchCharge,
 ) -> Result<LnFetchChargeRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/ln-address/fetch-charge");
+    let url = "https://api.zebedee.io/v0/ln-address/fetch-charge".to_string();
     let resp = client
         .reqw_cli
         .post(&url)
@@ -194,7 +194,7 @@ pub async fn fetch_charge_ln_address(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -207,7 +207,7 @@ pub async fn fetch_charge_ln_address(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -251,7 +251,7 @@ pub async fn validate_ln_address(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -264,7 +264,7 @@ pub async fn validate_ln_address(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -292,7 +292,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
     #[tokio::test]
     async fn test_fetch_charge_ln_address() {
@@ -308,7 +308,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -327,6 +327,6 @@ mod tests {
         .await
         .unwrap()
         .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 }

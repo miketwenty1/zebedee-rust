@@ -33,7 +33,7 @@ impl ZebedeeClient {
     }
 }
 
-#[derive(Clone, Validate, Deserialize, Debug)]
+#[derive(Default, Clone, Validate, Deserialize, Debug)]
 pub struct ZebedeeOauth {
     #[validate(length(equal = 36))]
     pub client_id: String,
@@ -45,20 +45,20 @@ pub struct ZebedeeOauth {
     pub state: String,
 }
 
-impl Default for ZebedeeOauth {
-    fn default() -> Self {
-        ZebedeeOauth {
-            client_id: Default::default(),
-            secret: Default::default(),
-            redirect_uri: Default::default(),
-            state: Default::default(),
-        }
-    }
-}
+// impl Default for ZebedeeOauth {
+//     fn default() -> Self {
+//         ZebedeeOauth {
+//             client_id: Default::default(),
+//             secret: Default::default(),
+//             redirect_uri: Default::default(),
+//             state: Default::default(),
+//         }
+//     }
+// }
 
 impl ZebedeeClient {
     pub fn set_oauth(
-        self: Self,
+        self,
         client_id: String,
         secret: String,
         redirect_uri: String,

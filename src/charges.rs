@@ -91,7 +91,7 @@ pub async fn create_charge(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
                 s,
-                resp_text.clone()
+                resp_text
             ));
         }
     };
@@ -104,7 +104,7 @@ pub async fn create_charge(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -131,7 +131,7 @@ pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow:
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
                 s,
-                resp_text.clone()
+                resp_text
             ));
         }
     };
@@ -144,7 +144,7 @@ pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow:
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -176,7 +176,7 @@ pub async fn get_charge(
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}, charge_id: {}, url: {}",
                 s,
-                resp_text.clone(),
+                resp_text,
                 charge_id,
                 &url,
             ));
@@ -191,7 +191,7 @@ pub async fn get_charge(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\ncharge_id: {}\n url: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code,
                 charge_id,
                 &url,
@@ -217,7 +217,7 @@ mod tests {
         };
 
         let r = create_charge(zebedee_client, charge).await.unwrap();
-        assert_eq!(r.success, true);
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_charges() {
@@ -225,7 +225,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_charges(zebedee_client).await.unwrap();
-        assert_eq!(r.success, true);
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_charge() {
@@ -239,6 +239,6 @@ mod tests {
 
         let r = create_charge(zebedee_client.clone(), charge).await.unwrap();
         let r2 = get_charge(zebedee_client, r.data.id).await.unwrap();
-        assert_eq!(r2.success, true);
+        assert!(r2.success);
     }
 }

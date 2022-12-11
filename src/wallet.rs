@@ -32,7 +32,7 @@ pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyh
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -45,7 +45,7 @@ pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyh
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\n url: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code,
                 &url,
             ))

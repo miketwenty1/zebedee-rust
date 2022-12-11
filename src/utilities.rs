@@ -63,8 +63,8 @@ pub async fn get_is_supported_region_by_ip(
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
-            &url,
+            resp_text,
+            url,
         ));
     }
 
@@ -76,8 +76,8 @@ pub async fn get_is_supported_region_by_ip(
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
-                status_code
+                resp_text,
+                status_code,
             ))
         }
     };
@@ -86,7 +86,7 @@ pub async fn get_is_supported_region_by_ip(
 }
 
 pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/prod-ips");
+    let url = "https://api.zebedee.io/v0/prod-ips".to_string();
     let resp = client
         .reqw_cli
         .get(&url)
@@ -103,7 +103,7 @@ pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -116,7 +116,7 @@ pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -126,7 +126,7 @@ pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow
 }
 
 pub async fn get_btc_usd(client: ZebedeeClient) -> Result<GetBtcUsdRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/btcusd");
+    let url = "https://api.zebedee.io/v0/btcusd".to_string();
     let resp = client
         .reqw_cli
         .get(&url)
@@ -143,7 +143,7 @@ pub async fn get_btc_usd(client: ZebedeeClient) -> Result<GetBtcUsdRes, anyhow::
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
             status_code,
-            resp_text.clone(),
+            resp_text,
             &url,
         ));
     }
@@ -156,7 +156,7 @@ pub async fn get_btc_usd(client: ZebedeeClient) -> Result<GetBtcUsdRes, anyhow::
             return Err(anyhow::anyhow!(
                 "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\n status code: {}",
                 e,
-                resp_text.clone(),
+                resp_text,
                 status_code
             ))
         }
@@ -181,7 +181,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -190,7 +190,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_prod_ips(zebedee_client).await.unwrap().success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 
     #[tokio::test]
@@ -198,6 +198,6 @@ mod tests {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
         let r = get_btc_usd(zebedee_client).await.unwrap().success;
-        assert_eq!(r, true);
+        assert!(r);
     }
 }
