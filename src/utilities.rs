@@ -31,7 +31,6 @@ pub struct IpData {
 pub struct GetIsSupportedRegionByIpRes {
     pub success: bool,
     pub data: RegionIpData,
-    pub message: String,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -40,6 +39,10 @@ pub struct RegionIpData {
     pub ip_address: String,
     #[serde(rename = "isSupported")]
     pub is_supported: bool,
+    #[serde(rename = "ipCountry")]
+    pub ip_country: String,
+    #[serde(rename = "ipRegion")]
+    pub ip_region: String,
 }
 
 pub async fn get_is_supported_region_by_ip(
