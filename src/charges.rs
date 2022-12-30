@@ -86,7 +86,7 @@ pub async fn create_charge(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
@@ -126,7 +126,7 @@ pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow:
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
@@ -171,7 +171,7 @@ pub async fn get_charge(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}, charge_id: {}, url: {}",

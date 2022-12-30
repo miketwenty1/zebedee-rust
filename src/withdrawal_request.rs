@@ -94,7 +94,7 @@ pub async fn create_withdrawal_request(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
@@ -136,7 +136,7 @@ pub async fn get_withdrawal_requests(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
@@ -184,7 +184,7 @@ pub async fn get_withdrawal_request(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}, withdrawal_id: {}, url: {}",

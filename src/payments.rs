@@ -71,7 +71,7 @@ pub async fn pay_invoice(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
@@ -111,7 +111,7 @@ pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyho
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}",
@@ -156,7 +156,7 @@ pub async fn get_payment(
     let resp_text = resp.text().await?;
 
     match status_code {
-        reqwest::StatusCode::OK => dbg!("OK status:"),
+        reqwest::StatusCode::OK => (), //dbg!("OK status:"),
         s => {
             return Err(anyhow::anyhow!(
                 "Error: status {}, message: {}, payment_id: {}, url: {}",
