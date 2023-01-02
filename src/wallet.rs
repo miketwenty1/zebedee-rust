@@ -10,8 +10,10 @@ pub struct WalletData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WalletRes {
-    pub message: String,
-    pub data: WalletData,
+    //pub message: String,
+    pub data: Option<WalletData>,
+    pub success: Option<bool>,
+    pub message: Option<String>,
 }
 
 pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyhow::Error> {
@@ -70,6 +72,7 @@ mod tests {
             .await
             .unwrap()
             .data
+            .unwrap()
             .balance;
         let r2: u64 = r.parse().unwrap();
         assert!(any_balance.contains(&r2));

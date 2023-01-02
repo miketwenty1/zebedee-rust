@@ -31,16 +31,16 @@ pub struct ChargesData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllChargesRes {
-    pub success: bool,
-    pub data: Vec<ChargesData>,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<Vec<ChargesData>>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ChargesRes {
-    pub success: bool,
-    pub data: ChargesData,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<ChargesData>,
+    pub message: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for your charge requests
@@ -217,7 +217,7 @@ mod tests {
         };
 
         let r = create_charge(zebedee_client, charge).await.unwrap();
-        assert!(r.success);
+        assert!(r.success.unwrap());
     }
     #[tokio::test]
     async fn test_get_charges() {
@@ -225,7 +225,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_charges(zebedee_client).await.unwrap();
-        assert!(r.success);
+        assert!(r.success.unwrap());
     }
     #[tokio::test]
     async fn test_get_charge() {
@@ -238,7 +238,9 @@ mod tests {
         };
 
         let r = create_charge(zebedee_client.clone(), charge).await.unwrap();
-        let r2 = get_charge(zebedee_client, r.data.id).await.unwrap();
-        assert!(r2.success);
+        let r2 = get_charge(zebedee_client, r.data.unwrap().id)
+            .await
+            .unwrap();
+        assert!(r2.success.unwrap());
     }
 }

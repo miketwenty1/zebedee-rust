@@ -41,14 +41,16 @@ pub struct LnValidateData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnValidateRes {
-    pub success: bool,
-    pub data: LnValidateData,
+    pub success: Option<bool>,
+    pub data: Option<LnValidateData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnFetchChargeRes {
-    pub success: bool,
-    pub data: LnFetchChargeData,
+    pub success: Option<bool>,
+    pub data: Option<LnFetchChargeData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -85,9 +87,9 @@ pub struct LnSendPaymentData {
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnSendPaymentRes {
-    pub success: bool,
-    pub data: LnSendPaymentData,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<LnSendPaymentData>,
+    pub message: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for your Lightning Address payments
@@ -292,7 +294,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
     #[tokio::test]
     async fn test_fetch_charge_ln_address() {
@@ -308,7 +310,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 
     #[tokio::test]
@@ -327,6 +329,6 @@ mod tests {
         .await
         .unwrap()
         .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 }

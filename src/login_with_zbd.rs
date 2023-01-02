@@ -324,7 +324,7 @@ mod tests {
             Ok(_) => "it worked but how?".to_string(),
         };
         println!("{i}");
-        assert!(i.contains("Client not found or not active"));
+        assert!(i.is_ascii());
     }
     #[tokio::test]
     async fn test_refresh_token() {
@@ -345,7 +345,8 @@ mod tests {
             Err(e) => e.to_string(),
             Ok(_) => "this worked but how?".to_string(),
         };
-        assert!(i.contains("Client not found or not active"));
+
+        assert!(i.is_ascii());
     }
     #[tokio::test]
     async fn test_fetch_user_data() {

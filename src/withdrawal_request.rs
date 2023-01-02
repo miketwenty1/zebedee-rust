@@ -33,22 +33,23 @@ pub struct WithdrawalRequestsData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllWithdrawalRequestsRes {
-    pub message: String,
-    pub data: Vec<WithdrawalRequestsData>,
-    // weird this doesn't have a success
+    pub message: Option<String>,
+    pub data: Option<Vec<WithdrawalRequestsData>>,
+    pub success: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetWithdrawalRequestsRes {
-    pub data: WithdrawalRequestsData,
-    pub message: String,
+    pub data: Option<WithdrawalRequestsData>,
+    pub message: Option<String>,
+    pub success: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PostWithdrawalRequestsRes {
-    pub success: bool,
-    pub data: WithdrawalRequestsData,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<WithdrawalRequestsData>,
+    pub message: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for withdrawal requests
@@ -233,7 +234,7 @@ mod tests {
         let r = create_withdrawal_request(zebedee_client, withdrawal_request)
             .await
             .unwrap();
-        assert!(r.success);
+        assert!(r.success.unwrap());
     }
     #[tokio::test]
     async fn test_get_withdrawal_requests() {
@@ -241,7 +242,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_withdrawal_requests(zebedee_client).await.unwrap();
-        assert!(r.message.contains("Success"));
+        assert!(r.success.unwrap());
     }
     #[tokio::test]
     async fn test_get_withdrawal_request() {
@@ -256,9 +257,9 @@ mod tests {
         let r = create_withdrawal_request(zebedee_client.clone(), withdrawal_request)
             .await
             .unwrap();
-        let r2 = get_withdrawal_request(zebedee_client, r.data.id)
+        let r2 = get_withdrawal_request(zebedee_client, r.data.unwrap().id)
             .await
             .unwrap();
-        assert!(r2.message.contains("Success"));
+        assert!(r2.success.unwrap());
     }
 }

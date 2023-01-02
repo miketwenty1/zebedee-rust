@@ -4,9 +4,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetBtcUsdRes {
-    pub success: bool,
-    pub data: BtcUsdData,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<BtcUsdData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -18,8 +18,9 @@ pub struct BtcUsdData {
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetProdIpsRes {
-    pub success: bool,
-    pub data: IpData,
+    pub success: Option<bool>,
+    pub data: Option<IpData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -29,8 +30,9 @@ pub struct IpData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GetIsSupportedRegionByIpRes {
-    pub success: bool,
-    pub data: RegionIpData,
+    pub success: Option<bool>,
+    pub data: Option<RegionIpData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -184,7 +186,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 
     #[tokio::test]
@@ -193,7 +195,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_prod_ips(zebedee_client).await.unwrap().success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 
     #[tokio::test]
@@ -201,6 +203,6 @@ mod tests {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
         let zebedee_client = ZebedeeClient::new(apikey);
         let r = get_btc_usd(zebedee_client).await.unwrap().success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 }

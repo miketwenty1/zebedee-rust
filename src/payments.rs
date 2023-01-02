@@ -23,15 +23,15 @@ pub struct PaymentsData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AllPaymentsRes {
-    pub success: bool,
-    pub data: Vec<PaymentsData>,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<Vec<PaymentsData>>,
+    pub message: Option<String>,
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct PaymentsRes {
-    pub success: bool,
-    pub data: PaymentsData,
-    pub message: String,
+    pub success: Option<bool>,
+    pub data: Option<PaymentsData>,
+    pub message: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for normal ligthning bolt 11 payments
@@ -211,7 +211,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new(apikey);
 
         let r = get_payments(zebedee_client).await.unwrap();
-        assert!(r.success);
+        assert!(r.success.unwrap());
     }
     #[tokio::test]
     async fn test_get_payment() {

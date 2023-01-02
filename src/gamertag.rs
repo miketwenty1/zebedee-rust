@@ -8,8 +8,9 @@ use validator::Validate;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagUserIdRes {
-    pub success: bool,
-    pub data: HashMap<String, String>,
+    pub success: Option<bool>,
+    pub data: Option<HashMap<String, String>>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,8 +51,9 @@ impl Default for GamertagPayment {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagChargeRes {
-    pub success: bool,
-    pub data: GamertagChargeData,
+    pub success: Option<bool>,
+    pub data: Option<GamertagChargeData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -72,8 +74,9 @@ pub struct GamertagChargeData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagTxRes {
-    pub success: bool,
-    pub data: GamertagTxData,
+    pub message: Option<String>,
+    pub success: Option<bool>,
+    pub data: Option<GamertagTxData>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -359,7 +362,7 @@ mod tests {
             .unwrap()
             .success;
 
-        assert!(r);
+        assert!(r.unwrap());
     }
 
     #[tokio::test]
@@ -373,7 +376,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 
     #[tokio::test]
@@ -387,7 +390,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 
     #[tokio::test]
@@ -401,6 +404,6 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 }

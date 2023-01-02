@@ -5,8 +5,9 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysendRes {
-    pub success: bool,
-    pub data: KeysendData,
+    pub success: Option<bool>,
+    pub data: Option<KeysendData>,
+    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -124,6 +125,6 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r);
+        assert!(r.unwrap());
     }
 }
