@@ -15,12 +15,12 @@ pub struct KeysendTx {
     pub id: String,
     #[serde(rename = "walletId")]
     pub wallet_id: String,
-    pub r#type: String,
+    pub r#type: Option<String>,
     #[serde(rename = "totalAmount")]
     pub total_amount: String,
     pub fee: String,
     pub amount: String,
-    pub description: String,
+    pub description: Option<String>,
     pub status: String,
     #[serde(rename = "confirmedAt")]
     pub confirmed_at: Option<DateTime<Utc>>,
