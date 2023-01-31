@@ -5,14 +5,14 @@
 Cargo.toml:
 ```
 [dependencies]
-zebedee_rust = "0.3.0"
+zebedee_rust = "0.3.1"
 ```
 
 ### Example usage of some of the functions:
 ```rust
 use std::env;
 use zebedee_rust::{
-    charges::*, gamertag::*, keysend::*, wallet::*, withdrawal_request::*, ZebedeeClient,
+    charges::*, ZebedeeClient,
 };
 
 pub fn main() {
