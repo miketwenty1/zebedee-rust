@@ -134,7 +134,7 @@ pub async fn pay_ln_address(
     client: ZebedeeClient,
     payment: LnPayment,
 ) -> Result<LnSendPaymentRes, anyhow::Error> {
-    let url = "https://api.zebedee.io/v0/ln-address/send-payment".to_string();
+    let url = format!("{}/v0/ln-address/send-payment", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -178,7 +178,7 @@ pub async fn fetch_charge_ln_address(
     client: ZebedeeClient,
     payment: LnFetchCharge,
 ) -> Result<LnFetchChargeRes, anyhow::Error> {
-    let url = "https://api.zebedee.io/v0/ln-address/fetch-charge".to_string();
+    let url = format!("{}/v0/ln-address/fetch-charge", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -234,8 +234,8 @@ pub async fn validate_ln_address(
     };
 
     let url = format!(
-        "https://api.zebedee.io/v0/ln-address/validate/{}",
-        lightning_address.address
+        "{}/v0/ln-address/validate/{}",
+        client.domain, lightning_address.address
     );
     let resp = client
         .reqw_cli
@@ -283,7 +283,9 @@ mod tests {
     #[tokio::test]
     async fn test_pay_ln_address() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let payment = LnPayment {
             ln_address: String::from("miketwenty1@zbd.gg"),
@@ -299,7 +301,9 @@ mod tests {
     #[tokio::test]
     async fn test_fetch_charge_ln_address() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let payment = LnFetchCharge {
             ln_address: String::from("miketwenty1@zbd.gg"),
@@ -316,7 +320,9 @@ mod tests {
     #[tokio::test]
     async fn test_validate_ln_address() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let ln_address = String::from("andre@zbd.gg");
 

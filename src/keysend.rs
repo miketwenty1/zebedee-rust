@@ -37,7 +37,7 @@ pub struct KeysendData {
 
 /// Use this struct to create a well crafted json body for your keysend payments
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Keysend {
     pub amount: String,
     pub pubkey: String,
@@ -47,23 +47,11 @@ pub struct Keysend {
     pub callback_url: String,
 }
 
-impl Default for Keysend {
-    fn default() -> Self {
-        Keysend {
-            amount: String::from(""),
-            pubkey: String::from(""),
-            tlv_records: vec![],
-            metadata: String::from(""),
-            callback_url: String::from(""),
-        }
-    }
-}
-
 pub async fn keysend(
     client: ZebedeeClient,
     keysend_payload: Keysend,
 ) -> Result<KeysendRes, anyhow::Error> {
-    let url = "https://api.zebedee.io/v0/keysend-payment".to_string();
+    let url = format!("{}/v0/keysend-payment", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -111,7 +99,9 @@ mod tests {
     #[tokio::test]
     async fn test_keysend() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let keysend_payload = Keysend {
             amount: String::from("1000"),

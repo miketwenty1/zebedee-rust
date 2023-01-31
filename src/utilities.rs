@@ -51,7 +51,7 @@ pub async fn get_is_supported_region_by_ip(
     client: ZebedeeClient,
     ip: String,
 ) -> Result<GetIsSupportedRegionByIpRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/is-supported-region/{}", ip);
+    let url = format!("{}/v0/is-supported-region/{}", client.domain, ip);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -91,7 +91,7 @@ pub async fn get_is_supported_region_by_ip(
 }
 
 pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow::Error> {
-    let url = "https://api.zebedee.io/v0/prod-ips".to_string();
+    let url = format!("{}/v0/prod-ips", client.domain);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -131,7 +131,7 @@ pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow
 }
 
 pub async fn get_btc_usd(client: ZebedeeClient) -> Result<GetBtcUsdRes, anyhow::Error> {
-    let url = "https://api.zebedee.io/v0/btcusd".to_string();
+    let url = format!("{}/v0/btcusd", client.domain);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -178,7 +178,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_is_supported_region_by_ip() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let ip = String::from("3.225.112.64");
 
@@ -192,7 +194,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_prod_ips() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_prod_ips(zebedee_client).await.unwrap().success;
         assert!(r.unwrap());
@@ -201,7 +205,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_btc_usd() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
         let r = get_btc_usd(zebedee_client).await.unwrap().success;
         assert!(r.unwrap());
     }

@@ -104,7 +104,7 @@ pub async fn pay_gamertag(
         Err(e) => return Err(anyhow::anyhow!("Bad Gamertag Payment format {}", e)),
     };
 
-    let url = "https://api.zebedee.io/v0/gamertag/send-payment".to_string();
+    let url = format!("{}/v0/gamertag/send-payment", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -154,7 +154,7 @@ pub async fn fetch_charge_from_gamertag(
         Err(e) => return Err(anyhow::anyhow!("Bad data your payload: {}", e)),
     };
 
-    let url = "https://api.zebedee.io/v0/gamertag/charges".to_string();
+    let url = format!("{}/v0/gamertag/charges", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -199,8 +199,8 @@ pub async fn get_gamertag_tx(
     transaction_id: String,
 ) -> Result<GamertagTxRes, anyhow::Error> {
     let url = format!(
-        "https://api.zebedee.io/v0/gamertag/transaction/{}",
-        transaction_id
+        "{}/v0/gamertag/transaction/{}",
+        client.domain, transaction_id
     );
     let resp = client
         .reqw_cli
@@ -244,7 +244,7 @@ pub async fn get_userid_by_gamertag(
     client: ZebedeeClient,
     gamertag: String,
 ) -> Result<GamertagUserIdRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/user-id/gamertag/{}", gamertag);
+    let url = format!("{}/v0/user-id/gamertag/{}", client.domain, gamertag);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -287,7 +287,7 @@ pub async fn get_gamertag_by_userid(
     client: ZebedeeClient,
     user_id: String,
 ) -> Result<GamertagUserIdRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/gamertag/user-id/{}", user_id);
+    let url = format!("{}/v0/gamertag/user-id/{}", client.domain, user_id);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -334,7 +334,9 @@ mod tests {
     #[tokio::test]
     async fn test_pay_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let payment = GamertagPayment {
             gamertag: String::from("miketwenty1"),
@@ -349,7 +351,9 @@ mod tests {
     #[tokio::test]
     async fn test_fetch_charge_from_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let payment = GamertagPayment {
             gamertag: String::from("miketwenty1"),
@@ -368,7 +372,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_gamertag_tx() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let transaction_id = String::from("322294d5-c993-4eef-88a8-8c9de099e16b");
 
@@ -382,7 +388,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_userid_by_gamertag() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let gamertag = String::from("miketwenty1");
 
@@ -396,7 +404,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_gamertag_by_userid() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let user_id = String::from("0a872b22-d3e2-46c8-84af-139cce32a4c5");
 

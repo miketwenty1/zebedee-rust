@@ -8,27 +8,53 @@ pub mod utilities;
 pub mod wallet;
 pub mod withdrawal_request;
 
-use anyhow::Result;
 use rand::Rng;
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
-use uuid::Uuid;
 use validator::Validate;
 
-/// You need a client for every request. If you want to use login with zbd/oauth2 see the `set_oauth` fn
 #[derive(Clone, Debug)]
 pub struct ZebedeeClient {
+    pub domain: String,
     pub reqw_cli: reqwest::Client,
     pub apikey: String,
     pub oauth: ZebedeeOauth,
 }
 
 impl ZebedeeClient {
-    pub fn new(apikey: String) -> Self {
+    pub fn new() -> Self {
+        ZebedeeClient::default()
+    }
+    pub fn domain(mut self, domain: String) -> Self {
+        self.domain = domain;
+        self
+    }
+    pub fn apikey(mut self, apikey: String) -> Self {
+        self.apikey = apikey;
+        self
+    }
+    pub fn reqw_cli(mut self, reqw_cli: reqwest::Client) -> Self {
+        self.reqw_cli = reqw_cli;
+        self
+    }
+    pub fn oauth(
+        mut self,
+        client_id: String,
+        secret: String,
+        redirect_uri: String,
+        state: String,
+    ) -> Self {
+        let oauth = ZebedeeOauth::new(client_id, secret, redirect_uri, state);
+        self.oauth = oauth;
+        self
+    }
+
+    pub fn build(self) -> Self {
         ZebedeeClient {
-            reqw_cli: reqwest::Client::new(),
-            apikey,
-            oauth: Default::default(),
+            domain: self.domain,
+            reqw_cli: self.reqw_cli,
+            apikey: self.apikey,
+            oauth: self.oauth,
         }
     }
 }
@@ -45,46 +71,25 @@ pub struct ZebedeeOauth {
     pub state: String,
 }
 
-// impl Default for ZebedeeOauth {
-//     fn default() -> Self {
-//         ZebedeeOauth {
-//             client_id: Default::default(),
-//             secret: Default::default(),
-//             redirect_uri: Default::default(),
-//             state: Default::default(),
-//         }
-//     }
-// }
-
-impl ZebedeeClient {
-    pub fn set_oauth(
-        self,
-        client_id: String,
-        secret: String,
-        redirect_uri: String,
-        state: String,
-    ) -> Result<Self, anyhow::Error> {
-        Uuid::parse_str(&client_id)?;
-        Uuid::parse_str(&secret)?;
-        Uuid::parse_str(&state)?;
-
-        let zeb_oauth = ZebedeeOauth {
+impl ZebedeeOauth {
+    fn new(client_id: String, secret: String, redirect_uri: String, state: String) -> Self {
+        ZebedeeOauth {
             client_id,
             secret,
             redirect_uri,
             state,
-        };
+        }
+    }
+}
 
-        match zeb_oauth.validate() {
-            Ok(_) => (),
-            Err(e) => return Err(anyhow::anyhow!("Bad oauth inputs {}", e)),
-        };
-
-        Ok(ZebedeeClient {
-            reqw_cli: self.reqw_cli,
-            apikey: self.apikey,
-            oauth: zeb_oauth,
-        })
+impl Default for ZebedeeClient {
+    fn default() -> Self {
+        ZebedeeClient {
+            domain: String::from("https://api.zebedee.io"),
+            reqw_cli: reqwest::Client::new(),
+            apikey: String::from("errornotset"),
+            oauth: Default::default(),
+        }
     }
 }
 

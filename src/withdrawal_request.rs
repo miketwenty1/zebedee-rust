@@ -83,7 +83,7 @@ pub async fn create_withdrawal_request(
 ) -> Result<PostWithdrawalRequestsRes, anyhow::Error> {
     let resp = client
         .reqw_cli
-        .post("https://api.zebedee.io/v0/withdrawal-requests")
+        .post(format!("{}/v0/withdrawal-requests", client.domain))
         .header("Content-Type", "application/json")
         .header("apikey", client.apikey)
         .json(&withdrawal_request)
@@ -127,7 +127,7 @@ pub async fn get_withdrawal_requests(
 ) -> Result<AllWithdrawalRequestsRes, anyhow::Error> {
     let resp = client
         .reqw_cli
-        .get("https://api.zebedee.io/v0/withdrawal-requests")
+        .get(format!("{}/v0/withdrawal-requests", client.domain))
         .header("Content-Type", "application/json")
         .header("apikey", client.apikey)
         .send()
@@ -168,10 +168,7 @@ pub async fn get_withdrawal_request(
     client: ZebedeeClient,
     withdrawal_id: String,
 ) -> Result<GetWithdrawalRequestsRes, anyhow::Error> {
-    let url = format!(
-        "https://api.zebedee.io/v0/withdrawal-requests/{}",
-        withdrawal_id
-    );
+    let url = format!("{}/v0/withdrawal-requests/{}", client.domain, withdrawal_id);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -224,7 +221,9 @@ mod tests {
     #[tokio::test]
     async fn test_create_withdrawal_request() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let withdrawal_request = WithdrawalReqest {
             amount: String::from("10000"),
@@ -239,7 +238,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_withdrawal_requests() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_withdrawal_requests(zebedee_client).await.unwrap();
         assert!(r.success.unwrap());
@@ -247,7 +248,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_withdrawal_request() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let withdrawal_request = WithdrawalReqest {
             amount: String::from("10000"),

@@ -59,7 +59,7 @@ pub async fn pay_invoice(
 ) -> Result<PaymentsRes, anyhow::Error> {
     let resp = client
         .reqw_cli
-        .post("https://api.zebedee.io/v0/payments")
+        .post(format!("{}/v0/payments", client.domain))
         .header("Content-Type", "application/json")
         .header("apikey", client.apikey)
         .json(&payment)
@@ -101,7 +101,7 @@ pub async fn pay_invoice(
 pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyhow::Error> {
     let resp = client
         .reqw_cli
-        .get("https://api.zebedee.io/v0/payments")
+        .get(format!("{}/v0/payments", client.domain))
         .header("Content-Type", "application/json")
         .header("apikey", client.apikey)
         .send()
@@ -142,7 +142,7 @@ pub async fn get_payment(
     client: ZebedeeClient,
     payment_id: String,
 ) -> Result<PaymentsRes, anyhow::Error> {
-    let url = format!("https://api.zebedee.io/v0/payments/{}", payment_id);
+    let url = format!("{}/v0/payments/{}", client.domain, payment_id);
     let resp = client
         .reqw_cli
         .get(&url)
@@ -195,7 +195,9 @@ mod tests {
     #[tokio::test]
     async fn test_pay_invoice() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let payment = Payment {
             invoice: String::from("lnbc120n1p0tdjwmpp5ycws0d788cjeqp9rn2wwxfymrekj9n80wy2yrk66tuu3ga5wukfsdzq2pshjmt9de6zqen0wgsrzv3qwp5hsetvwvsxzapqwdshgmmndp5hxtnsd3skxefwxqzjccqp2sp5vnsvmjlu6hrfegcdjs47njrga36g3x45wfmqjjjlerwgagj62yysrzjq2v4aw4gy7m93en32dcaplym056zezcljdjshyk8yakwtsp2h4yvcz9atuqqhtsqqqqqqqlgqqqqqqgqjq9qy9qsqhykfacrdy06cuyegvt4p50su53qwgrqn5jf6d83fd0upsa4frpxqnm2zl323zuvmz5ypv9gh9nr3jav6u2ccwkpd56h3n6l3ja5q7wgpxudlv4"),
@@ -208,7 +210,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_payments() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_payments(zebedee_client).await.unwrap();
         assert!(r.success.unwrap());
@@ -216,7 +220,9 @@ mod tests {
     #[tokio::test]
     async fn test_get_payment() {
         let apikey: String = env::var("ZBD_API_KEY").unwrap();
-        let zebedee_client = ZebedeeClient::new(apikey);
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+        let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let payment_id = String::from("5d88b2e0-e491-40e1-a8a8-a81ae68f2297");
 
