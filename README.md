@@ -19,7 +19,7 @@ pub fn main() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zebedee_client = ZebedeeClient::new().apikey(apikey).build();
 
-    // Create an Bolt 11 Invoice for 5000 msat or 5 sat.
+    // Create a Bolt 11 Invoice for 5000 msat or 5 sat.
     let invoice = Charge {
         amount: String::from("5000"),
         ..Default::default()
