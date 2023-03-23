@@ -57,6 +57,9 @@ pub fn main() {
 
     // Initiate the payment
     let payment_res = pay_ln_address(zebedee_client, payment).await.unwrap();
+    
+    // Print the result
+    println!("Internal transfer result: {:?}", payment_res);
 }
 ```
 
@@ -77,7 +80,10 @@ pub fn main() {
         receiver_wallet_id: String::from("b2bcc262-186a-4fe8-961e-a5246383516c"),
     };
 
+    // Initiate the internal transfer
     let transfer_res = internal_transfer(zebedee_client, internal_transfer_payload).await.unwrap();
+    
+    // Print the result
     println!("Internal transfer result: {:?}", transfer_res);
 }
 ```
