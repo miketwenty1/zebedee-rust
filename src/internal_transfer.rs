@@ -102,7 +102,7 @@ mod tests {
 
         let i = match r {
             Err(e) => e.to_string(),
-            Ok(_) => "was a good token but it shouldnt be".to_string(),
+            Ok(_) => "was a good transfer but it shouldnt be".to_string(),
         };
         assert!(i.contains("Error processing transfer."));
     }
