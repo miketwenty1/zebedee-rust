@@ -7,6 +7,7 @@ pub mod payments;
 pub mod utilities;
 pub mod wallet;
 pub mod withdrawal_request;
+pub mod internal_transfer;
 
 use rand::Rng;
 use serde::Deserialize;
