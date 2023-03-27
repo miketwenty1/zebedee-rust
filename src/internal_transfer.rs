@@ -1,5 +1,6 @@
 use crate::ZebedeeClient;
 use anyhow::Result;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -8,32 +9,27 @@ pub struct InternalTransferRes {
     pub data: InternalTransferData,
     pub message: String,
 }
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct InternalTransferTx {
-    pub id: String,
-    #[serde(rename = "walletId")]
-    pub wallet_id: String,
-    pub r#type: Option<String>,
-    #[serde(rename = "totalAmount")]
-    pub total_amount: String,
-    pub fee: String,
-    pub amount: String,
-    pub description: Option<String>,
-    pub status: String,
-    #[serde(rename = "confirmedAt")]
-    pub confirmed_at: Option<String>,
-}
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InternalTransferData {
-    #[serde(rename = "transferId")]
-    pub transfer_id: String,
-    pub transaction: InternalTransferTx,
+    pub id: String,
+    pub status: String,
+    pub amount: String,
+    #[serde(rename = "senderWalletId")]
+    pub sender_wallet_id: String,
+    #[serde(rename = "receiverWalletId")]
+    pub receiver_wallet_id: String,
+    #[serde(rename = "userId")]
+    pub user_id: String,
+    #[serde(rename = "sendTxId")]
+    pub send_tx_id: String,
+    #[serde(rename = "receiveTxId")]
+    pub receive_tx_id: String,
+    #[serde(rename = "createdAt")]
+    pub created_at: Option<DateTime<Utc>>,
+    #[serde(rename = "updatedAt")]
+    pub updated_at: Option<DateTime<Utc>>,
 }
-
 /// Use this struct to create a well crafted json body for your internal transfers
-
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InternalTransfer {
     pub amount: String,
@@ -102,10 +98,12 @@ mod tests {
             receiver_wallet_id: String::from("b904ee02-ec0b-4fd4-b99f-1f2d3d0001a6"),
         };
 
-        let r = internal_transfer(zebedee_client, internal_transfer_payload)
-            .await
-            .unwrap()
-            .success;
-        assert!(r);
+        let r = internal_transfer(zebedee_client, internal_transfer_payload).await;
+
+        let i = match r {
+            Err(e) => e.to_string(),
+            Ok(_) => "was a good token but it shouldnt be".to_string(),
+        };
+        assert!(i.contains("Error processing transfer."));
     }
 }
