@@ -84,6 +84,10 @@ pub struct LnSendPaymentData {
     pub created_at: DateTime<Utc>,
     #[serde(rename = "processedAt")]
     pub processed_at: DateTime<Utc>,
+    #[serde(rename = "callbackURL")]
+    pub callback_url: Option<String>,
+    #[serde(rename = "internalId")]
+    pub internal_id: Option<String>
 }
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnSendPaymentRes {
