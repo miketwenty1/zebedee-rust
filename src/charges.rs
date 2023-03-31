@@ -1,4 +1,4 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -29,20 +29,6 @@ pub struct ChargesData {
     pub invoice: InvoiceData,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AllChargesRes {
-    pub success: Option<bool>,
-    pub data: Option<Vec<ChargesData>>,
-    pub message: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct ChargesRes {
-    pub success: Option<bool>,
-    pub data: Option<ChargesData>,
-    pub message: Option<String>,
-}
-
 /// Use this struct to create a well crafted json body for your charge requests
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Charge {
@@ -71,7 +57,7 @@ impl Default for Charge {
 pub async fn create_charge(
     client: ZebedeeClient,
     charge: Charge,
-) -> Result<ChargesRes, anyhow::Error> {
+) -> Result<StdResp<Option<ChargesData>>, anyhow::Error> {
     let resp = client
         .reqw_cli
         .post(format!("{}/v0/charges", client.domain))
@@ -98,7 +84,7 @@ pub async fn create_charge(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: ChargesRes = match resp_serialized {
+    let resp_seralized_2: StdResp<Option<ChargesData>> = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -113,7 +99,9 @@ pub async fn create_charge(
     Ok(resp_seralized_2)
 }
 
-pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow::Error> {
+pub async fn get_charges(
+    client: ZebedeeClient,
+) -> Result<StdResp<Option<Vec<ChargesData>>>, anyhow::Error> {
     let resp = client
         .reqw_cli
         .get(format!("{}/v0/charges", client.domain))
@@ -138,7 +126,7 @@ pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow:
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: AllChargesRes = match resp_serialized {
+    let resp_seralized_2: StdResp<Option<Vec<ChargesData>>> = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -156,7 +144,7 @@ pub async fn get_charges(client: ZebedeeClient) -> Result<AllChargesRes, anyhow:
 pub async fn get_charge(
     client: ZebedeeClient,
     charge_id: String,
-) -> Result<ChargesRes, anyhow::Error> {
+) -> Result<StdResp<Option<ChargesData>>, anyhow::Error> {
     let url = format!("{}/v0/charges/{}", client.domain, charge_id);
     let resp = client
         .reqw_cli
@@ -185,7 +173,7 @@ pub async fn get_charge(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: ChargesRes = match resp_serialized {
+    let resp_seralized_2: StdResp<Option<ChargesData>> = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -219,7 +207,7 @@ mod tests {
         };
 
         let r = create_charge(zebedee_client, charge).await.unwrap();
-        assert!(r.success.unwrap());
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_charges() {
@@ -229,7 +217,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_charges(zebedee_client).await.unwrap();
-        assert!(r.success.unwrap());
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_charge() {
@@ -247,6 +235,6 @@ mod tests {
         let r2 = get_charge(zebedee_client, r.data.unwrap().id)
             .await
             .unwrap();
-        assert!(r2.success.unwrap());
+        assert!(r2.success);
     }
 }

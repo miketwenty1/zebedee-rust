@@ -1,13 +1,6 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetBtcUsdRes {
-    pub success: Option<bool>,
-    pub data: Option<BtcUsdData>,
-    pub message: Option<String>,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct BtcUsdData {
@@ -16,23 +9,10 @@ pub struct BtcUsdData {
     #[serde(rename = "btcUsdTimestamp")]
     pub btc_usd_timestamp: String,
 }
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetProdIpsRes {
-    pub success: Option<bool>,
-    pub data: Option<IpData>,
-    pub message: Option<String>,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct IpData {
     pub ips: Vec<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetIsSupportedRegionByIpRes {
-    pub success: Option<bool>,
-    pub data: Option<RegionIpData>,
-    pub message: Option<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -50,7 +30,7 @@ pub struct RegionIpData {
 pub async fn get_is_supported_region_by_ip(
     client: ZebedeeClient,
     ip: String,
-) -> Result<GetIsSupportedRegionByIpRes, anyhow::Error> {
+) -> Result<StdResp<Option<RegionIpData>>, anyhow::Error> {
     let url = format!("{}/v0/is-supported-region/{}", client.domain, ip);
     let resp = client
         .reqw_cli
@@ -90,7 +70,7 @@ pub async fn get_is_supported_region_by_ip(
     Ok(resp_seralized_2)
 }
 
-pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow::Error> {
+pub async fn get_prod_ips(client: ZebedeeClient) -> Result<StdResp<Option<IpData>>, anyhow::Error> {
     let url = format!("{}/v0/prod-ips", client.domain);
     let resp = client
         .reqw_cli
@@ -130,7 +110,9 @@ pub async fn get_prod_ips(client: ZebedeeClient) -> Result<GetProdIpsRes, anyhow
     Ok(resp_seralized_2)
 }
 
-pub async fn get_btc_usd(client: ZebedeeClient) -> Result<GetBtcUsdRes, anyhow::Error> {
+pub async fn get_btc_usd(
+    client: ZebedeeClient,
+) -> Result<StdResp<Option<BtcUsdData>>, anyhow::Error> {
     let url = format!("{}/v0/btcusd", client.domain);
     let resp = client
         .reqw_cli
@@ -188,7 +170,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 
     #[tokio::test]
@@ -199,7 +181,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_prod_ips(zebedee_client).await.unwrap().success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 
     #[tokio::test]
@@ -209,6 +191,6 @@ mod tests {
             env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
         let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
         let r = get_btc_usd(zebedee_client).await.unwrap().success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 }

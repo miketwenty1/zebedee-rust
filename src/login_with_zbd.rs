@@ -1,4 +1,4 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
@@ -76,11 +76,6 @@ impl FetchRefresh {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct FetchUserRes {
-    pub success: bool,
-    pub data: ZBDUserData,
-}
-#[derive(Debug, Serialize, Deserialize)]
 pub struct ZBDUserData {
     pub id: String,
     pub email: String,
@@ -96,11 +91,27 @@ pub struct ZBDUserData {
     pub public_static_charge: String,
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ZBDUserWalletData {
+    pub balance: String,
+    #[serde(rename = "remainingAmountLimits")]
+    pub remaining_amount_limits: ZBDUserWalletDataLimits,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ZBDUserWalletDataLimits {
+    daily: String,
+    #[serde(rename = "maxCredit")]
+    max_credit: String,
+    monthly: String,
+    weekly: String,
+}
+
 pub async fn create_auth_url(
     client: ZebedeeClient,
     challenge: String,
 ) -> Result<String, anyhow::Error> {
-    let url = format!("{}/v0/oauth2/authorize", client.domain);
+    let url = format!("{}/v1/oauth2/authorize", client.domain);
     let auth_url = client
         .reqw_cli
         .get(url)
@@ -131,7 +142,7 @@ pub async fn fetch_token(
 ) -> Result<FetchPostRes, anyhow::Error> {
     payload.validate()?;
 
-    let url = format!("{}/v0/oauth2/token", client.domain);
+    let url = format!("{}/v1/oauth2/token", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -176,7 +187,7 @@ pub async fn refresh_token(
 ) -> Result<FetchPostRes, anyhow::Error> {
     payload.validate()?;
 
-    let url = format!("{}/v0/oauth2/token", client.domain);
+    let url = format!("{}/v1/oauth2/token", client.domain);
     let resp = client
         .reqw_cli
         .post(&url)
@@ -218,16 +229,65 @@ pub async fn refresh_token(
 pub async fn fetch_user_data(
     client: ZebedeeClient,
     bearer_token: String,
-) -> Result<FetchUserRes, anyhow::Error> {
+) -> Result<StdResp<ZBDUserData>, anyhow::Error> {
     let mut token_header_string: String = "Bearer ".to_owned();
     token_header_string.push_str(&bearer_token);
 
-    let url = format!("{}/v0/oauth2/user", client.domain);
+    let url = format!("{}/v1/oauth2/user", client.domain);
     let resp = client
         .reqw_cli
         .get(&url)
         .header("Content-Type", "application/json")
-        .header("Authorization", token_header_string)
+        .header("usertoken", token_header_string)
+        .header("apikey", client.apikey)
+        .send()
+        .await?;
+
+    let status_code = resp.status();
+    let status_success = resp.status().is_success();
+    let resp_text = resp.text().await?;
+
+    if !status_success {
+        return Err(anyhow::anyhow!(
+            "Error: status {}, message: {}, url: {}",
+            status_code,
+            resp_text,
+            &url,
+        ));
+    }
+
+    let resp_serialized = serde_json::from_str(&resp_text);
+
+    let resp_seralized_2 = match resp_serialized {
+        Ok(c) => c,
+        Err(e) => {
+            return Err(anyhow::anyhow!(
+                "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\n url: {}",
+                e,
+                resp_text,
+                status_code,
+                &url,
+            ))
+        }
+    };
+
+    Ok(resp_seralized_2)
+}
+
+pub async fn fetch_user_wallet_data(
+    client: ZebedeeClient,
+    bearer_token: String,
+) -> Result<StdResp<ZBDUserWalletData>, anyhow::Error> {
+    let mut token_header_string: String = "Bearer ".to_owned();
+    token_header_string.push_str(&bearer_token);
+
+    let url = format!("{}/v1/oauth2/user", client.domain);
+    let resp = client
+        .reqw_cli
+        .get(&url)
+        .header("Content-Type", "application/json")
+        .header("usertoken", token_header_string)
+        .header("apikey", client.apikey)
         .send()
         .await?;
 
@@ -331,7 +391,6 @@ mod tests {
 
             Ok(_) => "it worked but how?".to_string(),
         };
-        println!("{i}");
         assert!(i.is_ascii());
     }
     #[tokio::test]
@@ -382,6 +441,31 @@ mod tests {
             Err(e) => e.to_string(),
             Ok(_) => "was a good token but it shouldnt be".to_string(),
         };
-        assert!(i.contains("Bad token"));
+        assert!(i.contains("Token is either invalid or expired"));
+    }
+    #[tokio::test]
+    async fn test_fetch_user_wallet_data() {
+        let apikey: String = env::var("ZBD_API_KEY").unwrap();
+        let oauth_client_id: String = env::var("ZBD_OAUTH_CLIENT_ID").unwrap();
+        let oauth_secret: String = env::var("ZBD_OAUTH_SECRET").unwrap();
+        let redirect_uri: String = env::var("ZBD_REDIRECT_URI").unwrap();
+        let state: String = env::var("ZBD_OAUTH_STATE").unwrap();
+        let zbdenv: String =
+            env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
+
+        let zebedee_client = ZebedeeClient::new()
+            .domain(zbdenv)
+            .apikey(apikey)
+            .oauth(oauth_client_id, oauth_secret, redirect_uri, state)
+            .build();
+
+        let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
+        let r = fetch_user_wallet_data(zebedee_client, fake_refresh_token);
+        let i = match r.await {
+            Err(e) => e.to_string(),
+            Ok(_) => "was a good token but it shouldnt be".to_string(),
+        };
+        println!("{}", i);
+        assert!(i.contains("Token is either invalid or expired"));
     }
 }

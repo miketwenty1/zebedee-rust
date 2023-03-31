@@ -1,4 +1,4 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use serde::{Deserialize, Serialize};
 
@@ -8,15 +8,9 @@ pub struct WalletData {
     pub balance: String,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct WalletRes {
-    //pub message: String,
-    pub data: Option<WalletData>,
-    pub success: Option<bool>,
-    pub message: Option<String>,
-}
-
-pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyhow::Error> {
+pub async fn get_wallet_details(
+    client: ZebedeeClient,
+) -> Result<StdResp<Option<WalletData>>, anyhow::Error> {
     let url = format!("{}/v0/wallet", client.domain);
     let resp = client
         .reqw_cli
@@ -41,7 +35,7 @@ pub async fn get_wallet_details(client: ZebedeeClient) -> Result<WalletRes, anyh
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: WalletRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(

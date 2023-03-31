@@ -1,14 +1,7 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct KeysendRes {
-    pub success: Option<bool>,
-    pub data: Option<KeysendData>,
-    pub message: Option<String>,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KeysendTx {
@@ -50,7 +43,7 @@ pub struct Keysend {
 pub async fn keysend(
     client: ZebedeeClient,
     keysend_payload: Keysend,
-) -> Result<KeysendRes, anyhow::Error> {
+) -> Result<StdResp<Option<KeysendData>>, anyhow::Error> {
     let url = format!("{}/v0/keysend-payment", client.domain);
     let resp = client
         .reqw_cli
@@ -115,6 +108,6 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 }

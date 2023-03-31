@@ -1,5 +1,6 @@
 pub mod charges;
 pub mod gamertag;
+pub mod internal_transfer;
 pub mod keysend;
 pub mod ln_address;
 pub mod login_with_zbd;
@@ -7,10 +8,9 @@ pub mod payments;
 pub mod utilities;
 pub mod wallet;
 pub mod withdrawal_request;
-pub mod internal_transfer;
 
 use rand::Rng;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use validator::Validate;
 
@@ -132,4 +132,11 @@ impl PKCE {
         let random_bytes = rand::thread_rng().gen::<[u8; 32]>();
         Self::new(random_bytes)
     }
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StdResp<T> {
+    pub success: bool,
+    pub data: T,
+    pub message: Option<String>,
 }

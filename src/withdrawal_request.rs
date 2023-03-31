@@ -1,4 +1,4 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -31,27 +31,6 @@ pub struct WithdrawalRequestsData {
     pub invoice: InvoiceData,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AllWithdrawalRequestsRes {
-    pub message: Option<String>,
-    pub data: Option<Vec<WithdrawalRequestsData>>,
-    pub success: Option<bool>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GetWithdrawalRequestsRes {
-    pub data: Option<WithdrawalRequestsData>,
-    pub message: Option<String>,
-    pub success: Option<bool>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PostWithdrawalRequestsRes {
-    pub success: Option<bool>,
-    pub data: Option<WithdrawalRequestsData>,
-    pub message: Option<String>,
-}
-
 /// Use this struct to create a well crafted json body for withdrawal requests
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WithdrawalReqest {
@@ -80,7 +59,7 @@ impl Default for WithdrawalReqest {
 pub async fn create_withdrawal_request(
     client: ZebedeeClient,
     withdrawal_request: WithdrawalReqest,
-) -> Result<PostWithdrawalRequestsRes, anyhow::Error> {
+) -> Result<StdResp<Option<WithdrawalRequestsData>>, anyhow::Error> {
     let resp = client
         .reqw_cli
         .post(format!("{}/v0/withdrawal-requests", client.domain))
@@ -107,7 +86,7 @@ pub async fn create_withdrawal_request(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: PostWithdrawalRequestsRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -124,7 +103,7 @@ pub async fn create_withdrawal_request(
 
 pub async fn get_withdrawal_requests(
     client: ZebedeeClient,
-) -> Result<AllWithdrawalRequestsRes, anyhow::Error> {
+) -> Result<StdResp<Option<Vec<WithdrawalRequestsData>>>, anyhow::Error> {
     let resp = client
         .reqw_cli
         .get(format!("{}/v0/withdrawal-requests", client.domain))
@@ -149,7 +128,7 @@ pub async fn get_withdrawal_requests(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: AllWithdrawalRequestsRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -167,7 +146,7 @@ pub async fn get_withdrawal_requests(
 pub async fn get_withdrawal_request(
     client: ZebedeeClient,
     withdrawal_id: String,
-) -> Result<GetWithdrawalRequestsRes, anyhow::Error> {
+) -> Result<StdResp<Option<WithdrawalRequestsData>>, anyhow::Error> {
     let url = format!("{}/v0/withdrawal-requests/{}", client.domain, withdrawal_id);
     let resp = client
         .reqw_cli
@@ -196,7 +175,7 @@ pub async fn get_withdrawal_request(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: GetWithdrawalRequestsRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -233,7 +212,7 @@ mod tests {
         let r = create_withdrawal_request(zebedee_client, withdrawal_request)
             .await
             .unwrap();
-        assert!(r.success.unwrap());
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_withdrawal_requests() {
@@ -243,7 +222,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_withdrawal_requests(zebedee_client).await.unwrap();
-        assert!(r.success.unwrap());
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_withdrawal_request() {
@@ -263,6 +242,6 @@ mod tests {
         let r2 = get_withdrawal_request(zebedee_client, r.data.unwrap().id)
             .await
             .unwrap();
-        assert!(r2.success.unwrap());
+        assert!(r2.success);
     }
 }

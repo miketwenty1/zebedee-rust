@@ -1,24 +1,10 @@
 use std::collections::HashMap;
 
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GamertagUserIdRes {
-    pub success: Option<bool>,
-    pub data: Option<HashMap<String, String>>,
-    pub message: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GamertagPaymentRes {
-    pub success: bool,
-    pub data: GamertagPaymentData,
-    pub message: String,
-}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagPaymentData {
@@ -50,13 +36,6 @@ impl Default for GamertagPayment {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct GamertagChargeRes {
-    pub success: Option<bool>,
-    pub data: Option<GamertagChargeData>,
-    pub message: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagChargeData {
     #[serde(rename = "invoiceRequest")]
     pub invoice_request: String,
@@ -70,13 +49,6 @@ pub struct GamertagChargeData {
     pub internal_id: Option<String>,
     pub amount: String,
     pub description: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct GamertagTxRes {
-    pub message: Option<String>,
-    pub success: Option<bool>,
-    pub data: Option<GamertagTxData>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -98,7 +70,7 @@ pub struct GamertagTxData {
 pub async fn pay_gamertag(
     client: ZebedeeClient,
     payment: GamertagPayment,
-) -> Result<GamertagPaymentRes, anyhow::Error> {
+) -> Result<StdResp<GamertagPaymentData>, anyhow::Error> {
     match payment.validate() {
         Ok(_) => (),
         Err(e) => return Err(anyhow::anyhow!("Bad Gamertag Payment format {}", e)),
@@ -148,7 +120,7 @@ pub async fn pay_gamertag(
 pub async fn fetch_charge_from_gamertag(
     client: ZebedeeClient,
     payment: GamertagPayment,
-) -> Result<GamertagChargeRes, anyhow::Error> {
+) -> Result<StdResp<Option<GamertagChargeData>>, anyhow::Error> {
     match payment.validate() {
         Ok(_) => (),
         Err(e) => return Err(anyhow::anyhow!("Bad data your payload: {}", e)),
@@ -197,7 +169,7 @@ pub async fn fetch_charge_from_gamertag(
 pub async fn get_gamertag_tx(
     client: ZebedeeClient,
     transaction_id: String,
-) -> Result<GamertagTxRes, anyhow::Error> {
+) -> Result<StdResp<Option<GamertagTxData>>, anyhow::Error> {
     let url = format!(
         "{}/v0/gamertag/transaction/{}",
         client.domain, transaction_id
@@ -243,7 +215,7 @@ pub async fn get_gamertag_tx(
 pub async fn get_userid_by_gamertag(
     client: ZebedeeClient,
     gamertag: String,
-) -> Result<GamertagUserIdRes, anyhow::Error> {
+) -> Result<StdResp<Option<HashMap<String, String>>>, anyhow::Error> {
     let url = format!("{}/v0/user-id/gamertag/{}", client.domain, gamertag);
     let resp = client
         .reqw_cli
@@ -286,7 +258,7 @@ pub async fn get_userid_by_gamertag(
 pub async fn get_gamertag_by_userid(
     client: ZebedeeClient,
     user_id: String,
-) -> Result<GamertagUserIdRes, anyhow::Error> {
+) -> Result<StdResp<Option<HashMap<String, String>>>, anyhow::Error> {
     let url = format!("{}/v0/gamertag/user-id/{}", client.domain, user_id);
     let resp = client
         .reqw_cli
@@ -366,7 +338,7 @@ mod tests {
             .unwrap()
             .success;
 
-        assert!(r.unwrap());
+        assert!(r);
     }
 
     #[tokio::test]
@@ -382,7 +354,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 
     #[tokio::test]
@@ -398,7 +370,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 
     #[tokio::test]
@@ -414,6 +386,6 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 }

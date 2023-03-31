@@ -1,14 +1,8 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct InternalTransferRes {
-    pub success: bool,
-    pub data: InternalTransferData,
-    pub message: String,
-}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct InternalTransferData {
     pub id: String,
@@ -40,7 +34,7 @@ pub struct InternalTransfer {
 pub async fn internal_transfer(
     client: ZebedeeClient,
     internal_transfer_payload: InternalTransfer,
-) -> Result<InternalTransferRes, anyhow::Error> {
+) -> Result<StdResp<InternalTransferData>, anyhow::Error> {
     let url = format!("{}/v0/internal-transfer", client.domain);
     let resp = client
         .reqw_cli

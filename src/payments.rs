@@ -1,4 +1,4 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -19,19 +19,6 @@ pub struct PaymentsData {
     pub confirmed_at: Option<DateTime<Utc>>,
     pub description: String,
     pub status: String,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct AllPaymentsRes {
-    pub success: Option<bool>,
-    pub data: Option<Vec<PaymentsData>>,
-    pub message: Option<String>,
-}
-#[derive(Debug, Serialize, Deserialize)]
-pub struct PaymentsRes {
-    pub success: Option<bool>,
-    pub data: Option<PaymentsData>,
-    pub message: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for normal ligthning bolt 11 payments
@@ -56,7 +43,7 @@ impl Default for Payment {
 pub async fn pay_invoice(
     client: ZebedeeClient,
     payment: Payment,
-) -> Result<PaymentsRes, anyhow::Error> {
+) -> Result<StdResp<Option<PaymentsData>>, anyhow::Error> {
     let resp = client
         .reqw_cli
         .post(format!("{}/v0/payments", client.domain))
@@ -83,7 +70,7 @@ pub async fn pay_invoice(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: PaymentsRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -98,7 +85,9 @@ pub async fn pay_invoice(
     Ok(resp_seralized_2)
 }
 
-pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyhow::Error> {
+pub async fn get_payments(
+    client: ZebedeeClient,
+) -> Result<StdResp<Option<Vec<PaymentsData>>>, anyhow::Error> {
     let resp = client
         .reqw_cli
         .get(format!("{}/v0/payments", client.domain))
@@ -123,7 +112,7 @@ pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyho
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: AllPaymentsRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -141,7 +130,7 @@ pub async fn get_payments(client: ZebedeeClient) -> Result<AllPaymentsRes, anyho
 pub async fn get_payment(
     client: ZebedeeClient,
     payment_id: String,
-) -> Result<PaymentsRes, anyhow::Error> {
+) -> Result<StdResp<Option<PaymentsData>>, anyhow::Error> {
     let url = format!("{}/v0/payments/{}", client.domain, payment_id);
     let resp = client
         .reqw_cli
@@ -170,7 +159,7 @@ pub async fn get_payment(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: PaymentsRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -215,7 +204,7 @@ mod tests {
         let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
 
         let r = get_payments(zebedee_client).await.unwrap();
-        assert!(r.success.unwrap());
+        assert!(r.success);
     }
     #[tokio::test]
     async fn test_get_payment() {

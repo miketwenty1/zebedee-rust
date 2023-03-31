@@ -1,4 +1,4 @@
-use crate::ZebedeeClient;
+use crate::{StdResp, ZebedeeClient};
 use anyhow::Result;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -40,20 +40,6 @@ pub struct LnValidateData {
 }
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct LnValidateRes {
-    pub success: Option<bool>,
-    pub data: Option<LnValidateData>,
-    pub message: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct LnFetchChargeRes {
-    pub success: Option<bool>,
-    pub data: Option<LnFetchChargeData>,
-    pub message: Option<String>,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
 pub struct LnInvoice {
     pub uri: String,
     pub request: String,
@@ -87,13 +73,7 @@ pub struct LnSendPaymentData {
     #[serde(rename = "callbackURL")]
     pub callback_url: Option<String>,
     #[serde(rename = "internalId")]
-    pub internal_id: Option<String>
-}
-#[derive(Debug, Serialize, Deserialize)]
-pub struct LnSendPaymentRes {
-    pub success: Option<bool>,
-    pub data: Option<LnSendPaymentData>,
-    pub message: Option<String>,
+    pub internal_id: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for your Lightning Address payments
@@ -137,7 +117,7 @@ impl Default for LnFetchCharge {
 pub async fn pay_ln_address(
     client: ZebedeeClient,
     payment: LnPayment,
-) -> Result<LnSendPaymentRes, anyhow::Error> {
+) -> Result<StdResp<Option<LnSendPaymentData>>, anyhow::Error> {
     let url = format!("{}/v0/ln-address/send-payment", client.domain);
     let resp = client
         .reqw_cli
@@ -163,7 +143,7 @@ pub async fn pay_ln_address(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: LnSendPaymentRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -181,7 +161,7 @@ pub async fn pay_ln_address(
 pub async fn fetch_charge_ln_address(
     client: ZebedeeClient,
     payment: LnFetchCharge,
-) -> Result<LnFetchChargeRes, anyhow::Error> {
+) -> Result<StdResp<Option<LnFetchChargeData>>, anyhow::Error> {
     let url = format!("{}/v0/ln-address/fetch-charge", client.domain);
     let resp = client
         .reqw_cli
@@ -207,7 +187,7 @@ pub async fn fetch_charge_ln_address(
 
     let resp_serialized = serde_json::from_str(&resp_text);
 
-    let resp_seralized_2: LnFetchChargeRes = match resp_serialized {
+    let resp_seralized_2 = match resp_serialized {
         Ok(c) => c,
         Err(e) => {
             return Err(anyhow::anyhow!(
@@ -225,7 +205,7 @@ pub async fn fetch_charge_ln_address(
 pub async fn validate_ln_address(
     client: ZebedeeClient,
     lightning_address: LnAddress,
-) -> Result<LnValidateRes, anyhow::Error> {
+) -> Result<StdResp<Option<LnValidateData>>, anyhow::Error> {
     match lightning_address.validate() {
         Ok(_) => (),
         Err(e) => {
@@ -300,7 +280,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
     #[tokio::test]
     async fn test_fetch_charge_ln_address() {
@@ -318,7 +298,7 @@ mod tests {
             .await
             .unwrap()
             .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 
     #[tokio::test]
@@ -339,6 +319,6 @@ mod tests {
         .await
         .unwrap()
         .success;
-        assert!(r.unwrap());
+        assert!(r);
     }
 }
