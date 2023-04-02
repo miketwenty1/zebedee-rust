@@ -20,7 +20,7 @@ struct AuthURL {
 
 /// Use this struct to create a well crafted json body for token management with ZBD Oauth
 #[derive(Serialize, Validate, Deserialize, Debug)]
-pub struct FetchPost {
+pub struct FetchTokenBody {
     #[validate(length(equal = 36))]
     pub client_id: String,
     #[validate(length(equal = 36))]
@@ -35,9 +35,9 @@ pub struct FetchPost {
     pub redirect_uri: String,
 }
 
-impl FetchPost {
+impl FetchTokenBody {
     pub fn new(zc: ZebedeeClient, code: String, code_verifier: String) -> Self {
-        FetchPost {
+        FetchTokenBody {
             client_id: zc.oauth.client_id,
             client_secret: zc.oauth.secret,
             code,
@@ -46,6 +46,37 @@ impl FetchPost {
             redirect_uri: zc.oauth.redirect_uri,
         }
     }
+}
+// COMMENTED OUT BECAUSE API MAY BE UPDATED TO LOOK LIKE THIS PER DOCS.
+// #[derive(Serialize, Validate, Deserialize, Debug)]
+// pub struct FetchAccessTokenRes {
+//     #[serde(rename = "accessToken")]
+//     pub access_token: String,
+//     #[serde(rename = "usertoken")]
+//     token_type: String,
+//     #[serde(rename = "accessTokenExpirationDate")]
+//     pub access_token_expiration_date: Option<DateTime<Utc>>,
+//     #[serde(rename = "additionalParameters")]
+//     additional_parameters: FetchATAdditionalParams,
+//     #[serde(rename = "idToken")]
+//     id_token: Option<String>,
+//     #[serde(rename = "refreshToken")]
+//     refresh_token: String,
+
+// }
+// #[derive(Serialize, Validate, Deserialize, Debug)]
+// pub struct FetchATAdditionalParams {
+//     pub refresh_token_expires_in: i32
+// }
+
+#[derive(Serialize, Validate, Deserialize, Debug)]
+pub struct FetchAccessTokenRes {
+    pub access_token: String,
+    pub token_type: String,
+    pub expires_in: u32,
+    pub refresh_token: String,
+    pub refresh_token_expires_in: u32,
+    pub scope: String,
 }
 
 /// Use this struct to create a well crafted json body for token refreshes with ZBD Oauth
@@ -138,8 +169,8 @@ pub async fn create_auth_url(
 
 pub async fn fetch_token(
     client: ZebedeeClient,
-    payload: FetchPost,
-) -> Result<FetchPostRes, anyhow::Error> {
+    payload: FetchTokenBody,
+) -> Result<FetchAccessTokenRes, anyhow::Error> {
     payload.validate()?;
 
     let url = format!("{}/v1/oauth2/token", client.domain);
@@ -155,6 +186,7 @@ pub async fn fetch_token(
     let status_success = resp.status().is_success();
     let resp_text = resp.text().await?;
 
+    println!("this is the response from token\n{}", resp_text);
     if !status_success {
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
@@ -228,25 +260,23 @@ pub async fn refresh_token(
 
 pub async fn fetch_user_data(
     client: ZebedeeClient,
-    bearer_token: String,
+    token: String,
 ) -> Result<StdResp<ZBDUserData>, anyhow::Error> {
-    let mut token_header_string: String = "Bearer ".to_owned();
-    token_header_string.push_str(&bearer_token);
+    //let mut token_header_string: String = "Bearer ".to_owned();
+    //token_header_string.push_str(&bearer_token);
 
     let url = format!("{}/v1/oauth2/user", client.domain);
-    let resp = client
+    let req = client
         .reqw_cli
         .get(&url)
         .header("Content-Type", "application/json")
-        .header("usertoken", token_header_string)
-        .header("apikey", client.apikey)
-        .send()
-        .await?;
+        .header("usertoken", token)
+        .header("apikey", client.apikey);
+    let resp = req.send().await?;
 
     let status_code = resp.status();
     let status_success = resp.status().is_success();
     let resp_text = resp.text().await?;
-
     if !status_success {
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
@@ -276,25 +306,24 @@ pub async fn fetch_user_data(
 
 pub async fn fetch_user_wallet_data(
     client: ZebedeeClient,
-    bearer_token: String,
+    token: String,
 ) -> Result<StdResp<ZBDUserWalletData>, anyhow::Error> {
-    let mut token_header_string: String = "Bearer ".to_owned();
-    token_header_string.push_str(&bearer_token);
+    //let mut token_header_string: String = "Bearer ".to_owned();
+    //token_header_string.push_str(&bearer_token);
 
-    let url = format!("{}/v1/oauth2/user", client.domain);
-    let resp = client
+    let url = format!("{}/v1/oauth2/wallet", client.domain);
+    let req = client
         .reqw_cli
         .get(&url)
         .header("Content-Type", "application/json")
-        .header("usertoken", token_header_string)
-        .header("apikey", client.apikey)
-        .send()
-        .await?;
+        .header("usertoken", token)
+        .header("apikey", client.apikey);
+    let resp = req.send().await?;
 
     let status_code = resp.status();
     let status_success = resp.status().is_success();
     let resp_text = resp.text().await?;
-
+    // println!("THIS IS THE WALLLLET\n{}", resp_text);
     if !status_success {
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
@@ -307,21 +336,20 @@ pub async fn fetch_user_wallet_data(
     let resp_serialized = serde_json::from_str(&resp_text);
 
     let resp_seralized_2 = match resp_serialized {
-        Ok(c) => c,
-        Err(e) => {
-            return Err(anyhow::anyhow!(
-                "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\n url: {}",
-                e,
-                resp_text,
-                status_code,
-                &url,
-            ))
-        }
-    };
+            Ok(c) => c,
+            Err(e) => {
+                return Err(anyhow::anyhow!(
+                    "Was given a good status, but something failed when parsing to json\nserde parse error: {}, \ntext from API: {}\nstatus code: {}\n url: {}",
+                    e,
+                    resp_text,
+                    status_code,
+                    &url,
+                ))
+            }
+        };
 
     Ok(resp_seralized_2)
 }
-
 #[cfg(test)]
 mod tests {
     use crate::PKCE;
@@ -383,7 +411,7 @@ mod tests {
 
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
         let fake_code = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
-        let fetchbody = FetchPost::new(zebedee_client.clone(), fake_code, c.verifier);
+        let fetchbody = FetchTokenBody::new(zebedee_client.clone(), fake_code, c.verifier);
         let r = fetch_token(zebedee_client, fetchbody);
         //let mut i = String::from("");
         let i = match r.await {
