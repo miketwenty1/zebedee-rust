@@ -147,12 +147,12 @@ pub async fn create_auth_url(
         .reqw_cli
         .get(url)
         .header("Content-Type", "application/json")
-        .query(&[("client_id", client.oauth.clone().client_id)])
+        .query(&[("client_id", client.oauth.client_id)])
         .query(&[("response_type", "code")])
         .query(&[("redirect_uri", client.oauth.redirect_uri)])
         .query(&[("code_challenge_method", "S256")])
         .query(&[("code_challenge", challenge)])
-        .query(&[("scope", "user")])
+        .query(&[("scope", client.oauth.scope)])
         .query(&[("state", client.oauth.state)])
         .build()
         .unwrap()
@@ -186,7 +186,6 @@ pub async fn fetch_token(
     let status_success = resp.status().is_success();
     let resp_text = resp.text().await?;
 
-    println!("this is the response from token\n{}", resp_text);
     if !status_success {
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
@@ -323,7 +322,7 @@ pub async fn fetch_user_wallet_data(
     let status_code = resp.status();
     let status_success = resp.status().is_success();
     let resp_text = resp.text().await?;
-    // println!("THIS IS THE WALLLLET\n{}", resp_text);
+
     if !status_success {
         return Err(anyhow::anyhow!(
             "Error: status {}, message: {}, url: {}",
@@ -385,7 +384,13 @@ mod tests {
         let zebedee_client = ZebedeeClient::new()
             .domain(zbdenv)
             .apikey(apikey)
-            .oauth(oauth_client_id, oauth_secret, redirect_uri, state)
+            .oauth(
+                oauth_client_id,
+                oauth_secret,
+                redirect_uri,
+                state,
+                String::from("user"),
+            )
             .build();
 
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
@@ -406,7 +411,13 @@ mod tests {
         let zebedee_client = ZebedeeClient::new()
             .domain(zbdenv)
             .apikey(apikey)
-            .oauth(oauth_client_id, oauth_secret, redirect_uri, state)
+            .oauth(
+                oauth_client_id,
+                oauth_secret,
+                redirect_uri,
+                state,
+                String::from("user"),
+            )
             .build();
 
         let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
@@ -434,7 +445,13 @@ mod tests {
         let zebedee_client = ZebedeeClient::new()
             .domain(zbdenv)
             .apikey(apikey)
-            .oauth(oauth_client_id, oauth_secret, redirect_uri, state)
+            .oauth(
+                oauth_client_id,
+                oauth_secret,
+                redirect_uri,
+                state,
+                String::from("user"),
+            )
             .build();
 
         let fake_refresh_token = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
@@ -460,7 +477,13 @@ mod tests {
         let zebedee_client = ZebedeeClient::new()
             .domain(zbdenv)
             .apikey(apikey)
-            .oauth(oauth_client_id, oauth_secret, redirect_uri, state)
+            .oauth(
+                oauth_client_id,
+                oauth_secret,
+                redirect_uri,
+                state,
+                String::from("user"),
+            )
             .build();
 
         let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
@@ -484,7 +507,13 @@ mod tests {
         let zebedee_client = ZebedeeClient::new()
             .domain(zbdenv)
             .apikey(apikey)
-            .oauth(oauth_client_id, oauth_secret, redirect_uri, state)
+            .oauth(
+                oauth_client_id,
+                oauth_secret,
+                redirect_uri,
+                state,
+                String::from("user,wallet"),
+            )
             .build();
 
         let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
@@ -493,7 +522,6 @@ mod tests {
             Err(e) => e.to_string(),
             Ok(_) => "was a good token but it shouldnt be".to_string(),
         };
-        println!("{}", i);
         assert!(i.contains("Token is either invalid or expired"));
     }
 }

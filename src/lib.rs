@@ -44,8 +44,9 @@ impl ZebedeeClient {
         secret: String,
         redirect_uri: String,
         state: String,
+        scope: String,
     ) -> Self {
-        let oauth = ZebedeeOauth::new(client_id, secret, redirect_uri, state);
+        let oauth = ZebedeeOauth::new(client_id, secret, redirect_uri, state, scope);
         self.oauth = oauth;
         self
     }
@@ -70,15 +71,23 @@ pub struct ZebedeeOauth {
     pub redirect_uri: String,
     #[validate(length(equal = 36))]
     pub state: String,
+    pub scope: String,
 }
 
 impl ZebedeeOauth {
-    fn new(client_id: String, secret: String, redirect_uri: String, state: String) -> Self {
+    fn new(
+        client_id: String,
+        secret: String,
+        redirect_uri: String,
+        state: String,
+        scope: String,
+    ) -> Self {
         ZebedeeOauth {
             client_id,
             secret,
             redirect_uri,
             state,
+            scope,
         }
     }
 }

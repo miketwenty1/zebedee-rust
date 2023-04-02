@@ -63,7 +63,6 @@ mod tests {
         let zbdenv: String =
             env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
         let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
-        println!("{:#?}", zebedee_client);
         let any_balance = 0..; //u64::MAX;
         let r = get_wallet_details(zebedee_client)
             .await
