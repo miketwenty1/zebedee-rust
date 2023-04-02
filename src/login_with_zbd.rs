@@ -131,11 +131,11 @@ pub struct ZBDUserWalletData {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ZBDUserWalletDataLimits {
-    daily: String,
+    pub daily: String,
     #[serde(rename = "maxCredit")]
-    max_credit: String,
-    monthly: String,
-    weekly: String,
+    pub max_credit: String,
+    pub monthly: String,
+    pub weekly: String,
 }
 
 pub async fn create_auth_url(
