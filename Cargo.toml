@@ -17,7 +17,7 @@ serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 http = "0.2"
 validator = { version = "0.16", features = ["derive"] }
-base64-url = "1.4"
+base64-url = "2.0"
 rand = "0.8"
 sha2 = "0.10"
 
