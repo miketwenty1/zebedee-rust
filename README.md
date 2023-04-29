@@ -19,7 +19,7 @@ use std::env;
 use zebedee_rust::{charges::*, ZebedeeClient};
 
 #[tokio::main]
-async pub fn main() {
+async fn main() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zebedee_client = ZebedeeClient::new().apikey(apikey).build();
 
@@ -44,7 +44,7 @@ use std::env;
 use zebedee_rust::ln_address::{LnPayment, pay_ln_address, ZebedeeClient};
 
 #[tokio::main]
-async pub fn main() {
+async fn main() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zebedee_client = ZebedeeClient::new().apikey(apikey).build();
 
@@ -70,7 +70,7 @@ use std::env;
 use zebedee_rust::{internal_transfer::{{InternalTransfer, internal_transfer}}, ZebedeeClient};
 
 #[tokio::main]
-async pub fn main() {
+async fn main() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zebedee_client = ZebedeeClient::new().apikey(apikey).build();
 
