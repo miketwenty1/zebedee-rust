@@ -41,7 +41,7 @@ pub fn main() {
 
 ```rust
 use std::env;
-use zebedee_rust::ln_address::{LnPayment, pay_ln_address, ZebedeeClient};
+use zebedee_rust::{ln_address::{LnPayment, pay_ln_address}, ZebedeeClient};
 
 #[tokio::main]
 pub fn main() {
