@@ -522,6 +522,6 @@ mod tests {
             Err(e) => e.to_string(),
             Ok(_) => "was a good token but it shouldnt be".to_string(),
         };
-        assert!(i.contains("Token is either invalid or expired"));
+        assert!(i.contains("401"));
     }
 }
