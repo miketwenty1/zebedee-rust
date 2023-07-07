@@ -22,6 +22,7 @@ validator = { version = "0.16", features = ["derive"] }
 base64-url = "2.0"
 rand = "0.8"
 sha2 = "0.10"
+thiserror = "1.0.40"
 
 [dev-dependencies]
 tokio = { version = "1", features = ["full"] }

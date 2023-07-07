@@ -1,4 +1,5 @@
 pub mod charges;
+pub mod errors;
 pub mod gamertag;
 pub mod internal_transfer;
 pub mod keysend;
@@ -9,10 +10,25 @@ pub mod utilities;
 pub mod wallet;
 pub mod withdrawal_request;
 
+use charges::*;
+use errors::{ApiError, ErrorMsg};
+use gamertag::*;
+use internal_transfer::*;
+use keysend::*;
+use ln_address::*;
+use login_with_zbd::*;
+use payments::*;
 use rand::Rng;
-use serde::{Deserialize, Serialize};
+use reqwest::{RequestBuilder, Response};
+use serde::{de::DeserializeOwned, Deserialize, Serialize};
+use serde_json::Value;
 use sha2::{Digest, Sha256};
+use utilities::*;
 use validator::Validate;
+use wallet::*;
+use withdrawal_request::*;
+
+pub type Result<T, E = errors::ZebedeeError> = std::result::Result<T, E>;
 
 #[derive(Clone, Debug)]
 pub struct ZebedeeClient {
@@ -30,6 +46,8 @@ impl ZebedeeClient {
         self.domain = domain;
         self
     }
+
+    /// Project API key
     pub fn apikey(mut self, apikey: String) -> Self {
         self.apikey = apikey;
         self
@@ -58,6 +76,384 @@ impl ZebedeeClient {
             apikey: self.apikey,
             oauth: self.oauth,
         }
+    }
+
+    async fn parse_response<T>(&self, resp: Response) -> Result<T>
+    where
+        T: DeserializeOwned,
+    {
+        let is_success = resp.status().is_success();
+        // parse the resp body
+        let body = resp.json::<Value>().await?;
+
+        // based on success or error choose the appropriate data structure to deserialize
+        match is_success {
+            true => {
+                let body = serde_json::from_value::<T>(body)?;
+                Ok(body)
+            }
+            false => {
+                let err_body: ApiError = serde_json::from_value(body)?;
+                Err(err_body.into())
+            }
+        }
+    }
+
+    fn add_headers(&self, request_builder: RequestBuilder) -> RequestBuilder {
+        request_builder
+            .header("Content-Type", "application/json")
+            .header("apikey", &self.apikey)
+    }
+
+    /// Retrieves the total balance of a given Project Wallet.
+    pub async fn get_wallet_details(&self) -> Result<WalletInfoResponse> {
+        let url = format!("{}/v0/wallet", &self.domain);
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    /// Make payment directly to a Lightning Network node Public Key, without the need for a Payment Request / Charge.
+    pub async fn keysend(&self, keysend_payload: &Keysend) -> Result<KeysendResponse> {
+        let url = format!("{}/v0/keysend-payment", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(keysend_payload)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    /// Creates a new Charge / Payment Request in the Bitcoin Lightning Network, payable by any Lightning Network wallet.
+    /// These payment requests are single-use, fixed-amount QR codes. If you're looking for multi-use and multi-amount
+    /// payment requests you want Static Charges.
+    pub async fn create_charge(&self, charge: &Charge) -> Result<FetchOneChargeResponse> {
+        let url = format!("{}/v0/charges", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(&charge)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_charges(&self) -> Result<FetchChargesResponse> {
+        let url = format!("{}/v0/charges", &self.domain);
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    /// Retrieves all information relating a specific Charge / Payment Request.
+    pub async fn get_charge<T>(&self, charge_id: T) -> Result<FetchOneChargeResponse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!("{}/v0/charges/{}", &self.domain, charge_id.as_ref());
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    /// Send Bitcoin payments directly to a user's ZBD Gamertag
+    pub async fn pay_gamertag(&self, payment: &GamertagPayment) -> Result<GamertagPayResponse> {
+        payment
+            .validate()
+            .map_err(|e| ErrorMsg::BadGamerTagFormat(e.to_string()))?;
+
+        let url = format!("{}/v0/gamertag/send-payment", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(payment)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    /// Create a bolt 11 invoice so you can pay a specified gamertag
+    pub async fn fetch_charge_from_gamertag(
+        &self,
+        payment: &GamertagPayment,
+    ) -> Result<GamertagChargeResponse> {
+        payment
+            .validate()
+            .map_err(|e| ErrorMsg::BadPayloadData(e.to_string()))?;
+
+        let url = format!("{}/v0/gamertag/charges", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(payment)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_gamertag_tx<T>(&self, transaction_id: T) -> Result<GamertagTxResoonse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!(
+            "{}/v0/gamertag/transaction/{}",
+            &self.domain,
+            transaction_id.as_ref()
+        );
+
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_userid_by_gamertag<T>(&self, gamertag: T) -> Result<GamertagUserIdResponse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!("{}/v0/user-id/gamertag/{}", &self.domain, gamertag.as_ref());
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_gamertag_by_userid<T>(&self, user_id: T) -> Result<GamertagUserIdResponse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!("{}/v0/gamertag/user-id/{}", &self.domain, user_id.as_ref());
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn internal_transfer(
+        self,
+        internal_transfer_payload: &InternalTransfer,
+    ) -> Result<InternalTransferResponse> {
+        let url = format!("{}/v0/internal-transfer", &self.domain);
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(internal_transfer_payload)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn pay_ln_address(&self, payment: &LnPayment) -> Result<PayLnAddressResponse> {
+        let url = format!("{}/v0/ln-address/send-payment", &self.domain);
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(payment)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn fetch_charge_ln_address(
+        &self,
+        payment: &LnFetchCharge,
+    ) -> Result<FetchLnChargeResponse> {
+        let url = format!("{}/v0/ln-address/fetch-charge", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(payment)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn validate_ln_address(
+        &self,
+        lightning_address: &LnAddress,
+    ) -> Result<ValidateLnAddrResponse> {
+        lightning_address.validate().map_err(|e| {
+            ErrorMsg::BadLnAddress(lightning_address.address.clone(), e.to_string())
+        })?;
+
+        let url = format!(
+            "{}/v0/ln-address/validate/{}",
+            &self.domain, &lightning_address.address
+        );
+
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn pay_invoice(&self, payment: &Payment) -> Result<PaymentInvoiceResponse> {
+        let url = format!("{}/v0/payments", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(&payment)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_payments(&self) -> Result<FetchPaymentsResponse> {
+        let url = format!("{}/v0/payments", &self.domain);
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_payment<T>(&self, payment_id: T) -> Result<FetchOnePaymentsResponse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!("{}/v0/payments/{}", &self.domain, payment_id.as_ref());
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_is_supported_region_by_ip<T>(&self, ip: T) -> Result<SupportedIpResponse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!("{}/v0/is-supported-region/{}", &self.domain, ip.as_ref());
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_prod_ips(&self) -> Result<ProdIpsResponse> {
+        let url = format!("{}/v0/prod-ips", &self.domain);
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_btc_usd(&self) -> Result<BtcToUsdResponse> {
+        let url = format!("{}/v0/btcusd", &self.domain);
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn create_withdrawal_request(
+        &self,
+        withdrawal_request: &WithdrawalReqest,
+    ) -> Result<CreateWithdrawalResponse> {
+        let url = format!("{}/v0/withdrawal-requests", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .json(&withdrawal_request)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_withdrawal_requests(&self) -> Result<FetchWithdrawalsResponse> {
+        let url = format!("{}/v0/withdrawal-requests", &self.domain);
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn get_withdrawal_request<T>(
+        &self,
+        withdrawal_id: T,
+    ) -> Result<FetchOneWithdrawalResponse>
+    where
+        T: AsRef<str>,
+    {
+        let url = format!(
+            "{}/v0/withdrawal-requests/{}",
+            &self.domain,
+            withdrawal_id.as_ref()
+        );
+        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    pub async fn create_auth_url(&self, challenge: String) -> Result<String> {
+        let url = format!("{}/v1/oauth2/authorize", &self.domain);
+
+        let auth_url = self
+            .reqw_cli
+            .get(url)
+            .header("Content-Type", "application/json")
+            .query(&[("client_id", &self.oauth.client_id)])
+            .query(&[("response_type", "code")])
+            .query(&[("redirect_uri", &self.oauth.redirect_uri)])
+            .query(&[("code_challenge_method", "S256")])
+            .query(&[("code_challenge", challenge)])
+            .query(&[("scope", &self.oauth.scope)])
+            .query(&[("state", &self.oauth.state)])
+            .build()
+            .unwrap()
+            .url()
+            .to_string();
+
+        AuthURL::new(&auth_url).validate()?;
+
+        Ok(auth_url)
+    }
+
+    pub async fn fetch_token(&self, payload: FetchTokenBody) -> Result<FetchAccessTokenRes> {
+        payload.validate()?;
+
+        let url = format!("{}/v1/oauth2/token", &self.domain);
+
+        let resp = self
+            .reqw_cli
+            .post(&url)
+            .header("Content-Type", "application/json")
+            .json(&payload)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn refresh_token(&self, payload: FetchRefresh) -> Result<FetchPostRes> {
+        payload.validate()?;
+
+        let url = format!("{}/v1/oauth2/token", &self.domain);
+        let resp = self
+            .reqw_cli
+            .post(&url)
+            .header("Content-Type", "application/json")
+            .json(&payload)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn fetch_user_data(&self, token: String) -> Result<StdResp<ZBDUserData>> {
+        //let mut token_header_string: String = "Bearer ".to_owned();
+        //token_header_string.push_str(&bearer_token);
+
+        let url = format!("{}/v1/oauth2/user", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.get(&url))
+            .header("usertoken", token)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
+    }
+
+    pub async fn fetch_user_wallet_data(
+        &self,
+        token: String,
+    ) -> Result<StdResp<ZBDUserWalletData>> {
+        //let mut token_header_string: String = "Bearer ".to_owned();
+        //token_header_string.push_str(&bearer_token);
+
+        let url = format!("{}/v1/oauth2/wallet", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.get(&url))
+            .header("usertoken", token)
+            .send()
+            .await?;
+
+        self.parse_response(resp).await
     }
 }
 
