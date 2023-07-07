@@ -11,7 +11,7 @@ pub mod wallet;
 pub mod withdrawal_request;
 
 use charges::*;
-use errors::{ApiError, ErrorMsg};
+use errors::*;
 use gamertag::*;
 use internal_transfer::*;
 use keysend::*;
@@ -345,7 +345,7 @@ impl ZebedeeClient {
     /// partner exchange providers's price feeds.
     pub async fn get_btc_usd(&self) -> Result<BtcToUsdResponse> {
         let url = format!("{}/v0/btcusd", &self.domain);
-        let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        let resp = self.reqw_cli.get(&url).send().await?;
         self.parse_response(resp).await
     }
 
