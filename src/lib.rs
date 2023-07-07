@@ -32,10 +32,10 @@ pub type Result<T, E = errors::ZebedeeError> = std::result::Result<T, E>;
 
 #[derive(Clone, Debug)]
 pub struct ZebedeeClient {
-    pub domain: String,
-    pub reqw_cli: reqwest::Client,
-    pub apikey: String,
-    pub oauth: ZebedeeOauth,
+    domain: String,
+    reqw_cli: reqwest::Client,
+    apikey: String,
+    oauth: ZebedeeOauth,
 }
 
 impl ZebedeeClient {
@@ -490,14 +490,14 @@ impl ZebedeeClient {
 #[derive(Default, Clone, Validate, Deserialize, Debug)]
 pub struct ZebedeeOauth {
     #[validate(length(equal = 36))]
-    pub client_id: String,
+    client_id: String,
     #[validate(length(equal = 36))]
-    pub secret: String,
+    secret: String,
     #[validate(url)]
-    pub redirect_uri: String,
+    redirect_uri: String,
     #[validate(length(equal = 36))]
-    pub state: String,
-    pub scope: String,
+    state: String,
+    scope: String,
 }
 
 impl ZebedeeOauth {
@@ -532,9 +532,9 @@ impl Default for ZebedeeClient {
 #[derive(Clone, Debug, Validate, Deserialize)]
 pub struct PKCE {
     #[validate(length(equal = 43))]
-    pub verifier: String,
+    verifier: String,
     #[validate(length(equal = 43))]
-    pub challenge: String,
+    challenge: String,
 }
 
 impl PKCE {
