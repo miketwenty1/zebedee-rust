@@ -12,12 +12,14 @@ async fn test_create_challenge_from_string() {
         String::from("mBc-M8x_JG5qARgND5Vzx7fPu1EjZlapL_dVg4BjrkU")
     );
 }
+
 #[tokio::test]
 async fn test_create_challenge_rand() {
     let c = PKCE::new_rand();
 
     assert_eq!(c.challenge, c.challenge);
 }
+
 #[tokio::test]
 async fn test_create_oauth_auth_url() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
@@ -45,6 +47,7 @@ async fn test_create_oauth_auth_url() {
 
     assert!(r.await.is_ok());
 }
+
 #[tokio::test]
 async fn test_fetch_token() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
@@ -79,6 +82,7 @@ async fn test_fetch_token() {
     };
     assert!(i.is_ascii());
 }
+
 #[tokio::test]
 async fn test_refresh_token() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
@@ -111,6 +115,7 @@ async fn test_refresh_token() {
 
     assert!(i.is_ascii());
 }
+
 #[tokio::test]
 async fn test_fetch_user_data() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
@@ -141,6 +146,7 @@ async fn test_fetch_user_data() {
     };
     assert!(i.contains("Token is either invalid or expired"));
 }
+
 #[tokio::test]
 async fn test_fetch_user_wallet_data() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();

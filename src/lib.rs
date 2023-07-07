@@ -42,6 +42,8 @@ impl ZebedeeClient {
     pub fn new() -> Self {
         ZebedeeClient::default()
     }
+
+    /// Zebedee REST API url
     pub fn domain(mut self, domain: String) -> Self {
         self.domain = domain;
         self
@@ -52,6 +54,7 @@ impl ZebedeeClient {
         self.apikey = apikey;
         self
     }
+
     pub fn reqw_cli(mut self, reqw_cli: reqwest::Client) -> Self {
         self.reqw_cli = reqw_cli;
         self
@@ -193,6 +196,8 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Get data on payments sent to ZBD Gamertags.
+    /// The data payload returned will inform you of the status of that transaction as well as any associated fees.
     pub async fn get_gamertag_tx<T>(&self, transaction_id: T) -> Result<GamertagTxResoonse>
     where
         T: AsRef<str>,
@@ -207,6 +212,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Get a given User's ID when provided with a ZBD Gamertag.
     pub async fn get_userid_by_gamertag<T>(&self, gamertag: T) -> Result<GamertagUserIdResponse>
     where
         T: AsRef<str>,
@@ -216,6 +222,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Get a given user's ZBD Gamertag from user id
     pub async fn get_gamertag_by_userid<T>(&self, user_id: T) -> Result<GamertagUserIdResponse>
     where
         T: AsRef<str>,
@@ -225,6 +232,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Initiates a transfer of funds between two Project Wallets you own.
     pub async fn internal_transfer(
         self,
         internal_transfer_payload: &InternalTransfer,
@@ -239,6 +247,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Send Bitcoin payments directly to a Lightning Address.
     pub async fn pay_ln_address(&self, payment: &LnPayment) -> Result<PayLnAddressResponse> {
         let url = format!("{}/v0/ln-address/send-payment", &self.domain);
         let resp = self
@@ -250,6 +259,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Create a Charge / Payment Request QR code for a Lightning Address
     pub async fn fetch_charge_ln_address(
         &self,
         payment: &LnFetchCharge,
@@ -265,6 +275,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Validate whether a user's entered Lightning Address is indeed a real Lightning Address
     pub async fn validate_ln_address(
         &self,
         lightning_address: &LnAddress,
@@ -283,6 +294,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Pays a Charge / Payment Request in the Bitcoin Lightning Network
     pub async fn pay_invoice(&self, payment: &Payment) -> Result<PaymentInvoiceResponse> {
         let url = format!("{}/v0/payments", &self.domain);
 
@@ -301,6 +313,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Retrieves all the information related to a specific Payment
     pub async fn get_payment<T>(&self, payment_id: T) -> Result<FetchOnePaymentsResponse>
     where
         T: AsRef<str>,
@@ -310,6 +323,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Check if provided ip address will be [supported](https://zebedee.io/countries) by Zebedee REST API
     pub async fn get_is_supported_region_by_ip<T>(&self, ip: T) -> Result<SupportedIpResponse>
     where
         T: AsRef<str>,
@@ -319,18 +333,29 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Check if callback response is from legit Zebedee ip address
     pub async fn get_prod_ips(&self) -> Result<ProdIpsResponse> {
         let url = format!("{}/v0/prod-ips", &self.domain);
         let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
         self.parse_response(resp).await
     }
 
+    /// Get the latest price for Bitcoin in US Dollars.
+    /// The exchange rate feed is refreshed every 5 seconds and is based upon a combination of industry-leading
+    /// partner exchange providers's price feeds.
     pub async fn get_btc_usd(&self) -> Result<BtcToUsdResponse> {
         let url = format!("{}/v0/btcusd", &self.domain);
         let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
         self.parse_response(resp).await
     }
 
+    /// Withdrawal Requests can be thought of as exact opposites to Charges.
+    /// Charges in the ZEBEDEE API are QR codes that represent Payment Requests in the Bitcoin Lightning Network.
+    /// These QR codes expect that a payer will scan and perform a payment against it.
+    /// ***
+    /// `Charges`: Lightning QR codes that YOU SPEND
+    /// ***
+    /// `Withdrawal Requests`: Lightning QR codes that YOU RECEIVE
     pub async fn create_withdrawal_request(
         &self,
         withdrawal_request: &WithdrawalReqest,
@@ -352,6 +377,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// Retrieves details about a specific Withdrawal Request.
     pub async fn get_withdrawal_request<T>(
         &self,
         withdrawal_id: T,
@@ -408,6 +434,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// In order to fetch a new accessToken for a given ZBD User, make sure to use the refreshToken using the token endpoint.
     pub async fn refresh_token(&self, payload: FetchRefresh) -> Result<FetchPostRes> {
         payload.validate()?;
 
@@ -422,6 +449,8 @@ impl ZebedeeClient {
 
         self.parse_response(resp).await
     }
+
+    /// You can use this API endpoint to fetch information about a given ZBD User, granted you can pass the provided accessToken.
 
     pub async fn fetch_user_data(&self, token: String) -> Result<StdResp<ZBDUserData>> {
         //let mut token_header_string: String = "Bearer ".to_owned();
@@ -438,6 +467,7 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
+    /// You can use this API endpoint to fetch information about a given ZBD User's Wallet, granted you can pass the provided accessToken.
     pub async fn fetch_user_wallet_data(
         &self,
         token: String,

@@ -17,6 +17,7 @@ async fn test_pay_invoice() {
     let r = zebedee_client.pay_invoice(&payment).await.err().unwrap();
     assert!(r.to_string().contains("400"));
 }
+
 #[tokio::test]
 async fn test_get_payments() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
@@ -27,6 +28,7 @@ async fn test_get_payments() {
     let r = zebedee_client.get_payments().await.unwrap();
     assert!(r.success);
 }
+
 #[tokio::test]
 async fn test_get_payment() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
