@@ -30,7 +30,7 @@ async fn main() {
     };
 
     // Create the charge
-    let charges_res = create_charge(zebedee_client, charge).await.unwrap();
+    let charges_res = zebedee_client.create_charge(&charge).await.unwrap();
 
     // Print the response
     println!("{:?}", charges_res);
@@ -41,7 +41,7 @@ async fn main() {
 
 ```rust
 use std::env;
-use zebedee_rust::{ln_address::{LnPayment, pay_ln_address}, ZebedeeClient};
+use zebedee_rust::{ln_address::*, ZebedeeClient};
 
 #[tokio::main]
 async fn main() {
@@ -56,7 +56,7 @@ async fn main() {
     };
 
     // Initiate the payment
-    let payment_res = pay_ln_address(zebedee_client, payment).await.unwrap();
+    let payment_res = zebedee_client.pay_ln_address(&payment).await.unwrap();
     
     // Print the result
     println!("Internal transfer result: {:?}", payment_res);
@@ -67,7 +67,7 @@ async fn main() {
 
 ```rust
 use std::env;
-use zebedee_rust::{internal_transfer::{{InternalTransfer, internal_transfer}}, ZebedeeClient};
+use zebedee_rust::{internal_transfer::*, ZebedeeClient};
 
 #[tokio::main]
 async fn main() {
@@ -81,7 +81,7 @@ async fn main() {
     };
 
     // Initiate the internal transfer
-    let transfer_res = internal_transfer(zebedee_client, internal_transfer_payload).await.unwrap();
+    let transfer_res = zebedee_client.internal_transfer(&internal_transfer_payload).await.unwrap();
     
     // Print the result
     println!("Internal transfer result: {:?}", transfer_res);
