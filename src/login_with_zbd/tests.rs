@@ -73,7 +73,7 @@ async fn test_fetch_token() {
     let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
     let fake_code = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
     let fetchbody = FetchTokenBody::new(&zebedee_client, fake_code, c.verifier);
-    let r = zebedee_client.fetch_token(fetchbody);
+    let r = zebedee_client.fetch_token(&fetchbody);
     //let mut i = String::from("");
     let i = match r.await {
         Err(e) => e.to_string(),
