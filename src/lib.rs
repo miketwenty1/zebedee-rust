@@ -394,7 +394,10 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
-    pub async fn create_auth_url(&self, challenge: String) -> Result<String> {
+    pub async fn create_auth_url<T>(&self, challenge: T) -> Result<String>
+    where
+        T: AsRef<str>,
+    {
         let url = format!("{}/v1/oauth2/authorize", &self.domain);
 
         let auth_url = self
@@ -405,7 +408,7 @@ impl ZebedeeClient {
             .query(&[("response_type", "code")])
             .query(&[("redirect_uri", &self.oauth.redirect_uri)])
             .query(&[("code_challenge_method", "S256")])
-            .query(&[("code_challenge", challenge)])
+            .query(&[("code_challenge", challenge.as_ref())])
             .query(&[("scope", &self.oauth.scope)])
             .query(&[("state", &self.oauth.state)])
             .build()
@@ -461,7 +464,10 @@ impl ZebedeeClient {
 
     /// You can use this API endpoint to fetch information about a given ZBD User, granted you can pass the provided accessToken.
 
-    pub async fn fetch_user_data(&self, token: String) -> Result<StdResp<ZBDUserData>> {
+    pub async fn fetch_user_data<T>(&self, token: T) -> Result<StdResp<ZBDUserData>>
+    where
+        T: AsRef<str>,
+    {
         //let mut token_header_string: String = "Bearer ".to_owned();
         //token_header_string.push_str(&bearer_token);
 
@@ -469,7 +475,7 @@ impl ZebedeeClient {
 
         let resp = self
             .add_headers(self.reqw_cli.get(&url))
-            .header("usertoken", token)
+            .header("usertoken", token.as_ref())
             .send()
             .await?;
 
@@ -477,10 +483,10 @@ impl ZebedeeClient {
     }
 
     /// You can use this API endpoint to fetch information about a given ZBD User's Wallet, granted you can pass the provided accessToken.
-    pub async fn fetch_user_wallet_data(
-        &self,
-        token: String,
-    ) -> Result<StdResp<ZBDUserWalletData>> {
+    pub async fn fetch_user_wallet_data<T>(&self, token: T) -> Result<StdResp<ZBDUserWalletData>>
+    where
+        T: AsRef<str>,
+    {
         //let mut token_header_string: String = "Bearer ".to_owned();
         //token_header_string.push_str(&bearer_token);
 
@@ -488,7 +494,7 @@ impl ZebedeeClient {
 
         let resp = self
             .add_headers(self.reqw_cli.get(&url))
-            .header("usertoken", token)
+            .header("usertoken", token.as_ref())
             .send()
             .await?;
 

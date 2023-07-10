@@ -42,7 +42,7 @@ async fn test_create_oauth_auth_url() {
         .build();
 
     let c = PKCE::from("hellomynameiswhat");
-    let r = zebedee_client.create_auth_url(c.challenge.clone());
+    let r = zebedee_client.create_auth_url(&c.challenge);
 
     assert!(r.await.is_ok());
 }
