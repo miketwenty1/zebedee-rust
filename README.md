@@ -1,14 +1,8 @@
 # zebedee-rust
 
 - Interface easily with ZEBEDEE's public API's.
-- Currently supports every feature of the public zebedee API.
+- Currently supports most feature of the public zebedee API.
 
-Cargo.toml:
-
-```
-[dependencies]
-zebedee-rust = "0.3.6"
-```
 
 ## Example usage of some of the functions:
 
