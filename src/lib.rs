@@ -532,9 +532,9 @@ impl Default for ZebedeeClient {
 #[derive(Clone, Debug, Validate, Deserialize)]
 pub struct PKCE {
     #[validate(length(equal = 43))]
-    verifier: String,
+    pub verifier: String,
     #[validate(length(equal = 43))]
-    challenge: String,
+    pub challenge: String,
 }
 
 impl PKCE {

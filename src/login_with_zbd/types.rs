@@ -32,7 +32,7 @@ impl<'a> AuthURL<'a> {
 }
 
 /// Use this struct to create a well crafted json body for token management with ZBD Oauth
-#[derive(Serialize, Validate, Deserialize, Debug)]
+#[derive(Serialize, Clone, Validate, Deserialize, Debug)]
 pub struct FetchTokenBody {
     #[validate(length(equal = 36))]
     pub client_id: String,
@@ -49,14 +49,14 @@ pub struct FetchTokenBody {
 }
 
 impl FetchTokenBody {
-    pub fn new(zc: ZebedeeClient, code: String, code_verifier: String) -> Self {
+    pub fn new(zc: &ZebedeeClient, code: String, code_verifier: String) -> Self {
         FetchTokenBody {
-            client_id: zc.oauth.client_id,
-            client_secret: zc.oauth.secret,
+            client_id: zc.oauth.client_id.clone(),
+            client_secret: zc.oauth.secret.clone(),
             code,
             code_verifier,
             grant_type: String::from("authorization_code"),
-            redirect_uri: zc.oauth.redirect_uri,
+            redirect_uri: zc.oauth.redirect_uri.clone(),
         }
     }
 }
