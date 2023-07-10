@@ -394,7 +394,10 @@ impl ZebedeeClient {
         self.parse_response(resp).await
     }
 
-    pub async fn create_auth_url(&self, challenge: String) -> Result<String> {
+    pub async fn create_auth_url<T>(&self, challenge: T) -> Result<String>
+    where
+        T: AsRef<str>,
+    {
         let url = format!("{}/v1/oauth2/authorize", &self.domain);
 
         let auth_url = self
@@ -405,7 +408,7 @@ impl ZebedeeClient {
             .query(&[("response_type", "code")])
             .query(&[("redirect_uri", &self.oauth.redirect_uri)])
             .query(&[("code_challenge_method", "S256")])
-            .query(&[("code_challenge", challenge)])
+            .query(&[("code_challenge", challenge.as_ref())])
             .query(&[("scope", &self.oauth.scope)])
             .query(&[("state", &self.oauth.state)])
             .build()
@@ -418,7 +421,12 @@ impl ZebedeeClient {
         Ok(auth_url)
     }
 
-    pub async fn fetch_token(&self, payload: FetchTokenBody) -> Result<FetchAccessTokenRes> {
+    pub async fn fetch_token<A, B>(&self, code: A, verifier: B) -> Result<FetchAccessTokenRes>
+    where
+        A: AsRef<str>,
+        B: AsRef<str>,
+    {
+        let payload = FetchTokenBody::new(self, code.as_ref(), verifier.as_ref());
         payload.validate()?;
 
         let url = format!("{}/v1/oauth2/token", &self.domain);
@@ -435,7 +443,11 @@ impl ZebedeeClient {
     }
 
     /// In order to fetch a new accessToken for a given ZBD User, make sure to use the refreshToken using the token endpoint.
-    pub async fn refresh_token(&self, payload: FetchRefresh) -> Result<FetchPostRes> {
+    pub async fn refresh_token<T>(&self, refresh_token: T) -> Result<FetchPostRes>
+    where
+        T: AsRef<str>,
+    {
+        let payload = FetchRefresh::new(self, refresh_token.as_ref());
         payload.validate()?;
 
         let url = format!("{}/v1/oauth2/token", &self.domain);
@@ -452,7 +464,10 @@ impl ZebedeeClient {
 
     /// You can use this API endpoint to fetch information about a given ZBD User, granted you can pass the provided accessToken.
 
-    pub async fn fetch_user_data(&self, token: String) -> Result<StdResp<ZBDUserData>> {
+    pub async fn fetch_user_data<T>(&self, token: T) -> Result<StdResp<ZBDUserData>>
+    where
+        T: AsRef<str>,
+    {
         //let mut token_header_string: String = "Bearer ".to_owned();
         //token_header_string.push_str(&bearer_token);
 
@@ -460,7 +475,7 @@ impl ZebedeeClient {
 
         let resp = self
             .add_headers(self.reqw_cli.get(&url))
-            .header("usertoken", token)
+            .header("usertoken", token.as_ref())
             .send()
             .await?;
 
@@ -468,10 +483,10 @@ impl ZebedeeClient {
     }
 
     /// You can use this API endpoint to fetch information about a given ZBD User's Wallet, granted you can pass the provided accessToken.
-    pub async fn fetch_user_wallet_data(
-        &self,
-        token: String,
-    ) -> Result<StdResp<ZBDUserWalletData>> {
+    pub async fn fetch_user_wallet_data<T>(&self, token: T) -> Result<StdResp<ZBDUserWalletData>>
+    where
+        T: AsRef<str>,
+    {
         //let mut token_header_string: String = "Bearer ".to_owned();
         //token_header_string.push_str(&bearer_token);
 
@@ -479,7 +494,7 @@ impl ZebedeeClient {
 
         let resp = self
             .add_headers(self.reqw_cli.get(&url))
-            .header("usertoken", token)
+            .header("usertoken", token.as_ref())
             .send()
             .await?;
 
@@ -553,19 +568,23 @@ impl PKCE {
         p.validate().unwrap();
         p
     }
-    pub fn new_from_string(input: String) -> Self {
+
+    pub fn new_rand() -> Self {
+        let random_bytes = rand::thread_rng().gen::<[u8; 32]>();
+        Self::new(random_bytes)
+    }
+}
+
+impl From<&str> for PKCE {
+    fn from(value: &str) -> Self {
         let mut hasher = Sha256::new();
-        hasher.update(input);
+        hasher.update(value);
         let hash_result: [u8; 32] = hasher
             .finalize()
             .as_slice()
             .try_into()
             .expect("hashing went wrong from string");
         Self::new(hash_result)
-    }
-    pub fn new_rand() -> Self {
-        let random_bytes = rand::thread_rng().gen::<[u8; 32]>();
-        Self::new(random_bytes)
     }
 }
 

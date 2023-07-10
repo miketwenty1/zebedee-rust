@@ -3,10 +3,6 @@ use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use validator::Validate;
 
-// pub type CreateWithdrawalResponse = StdResp<Option<WithdrawalRequestsData>>;
-// pub type FetchWithdrawalsResponse = StdResp<Option<Vec<WithdrawalRequestsData>>>;
-// pub type FetchOneWithdrawalResponse = StdResp<Option<WithdrawalRequestsData>>;
-
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct FetchPostRes {
     pub access_token: String,
@@ -33,30 +29,34 @@ impl<'a> AuthURL<'a> {
 
 /// Use this struct to create a well crafted json body for token management with ZBD Oauth
 #[derive(Serialize, Clone, Validate, Deserialize, Debug)]
-pub struct FetchTokenBody {
+pub struct FetchTokenBody<'a> {
     #[validate(length(equal = 36))]
-    pub client_id: String,
+    pub client_id: Cow<'a, str>,
     #[validate(length(equal = 36))]
-    pub client_secret: String,
+    pub client_secret: Cow<'a, str>,
     #[validate(length(equal = 36))]
-    pub code: String,
+    pub code: Cow<'a, str>,
     #[validate(length(equal = 43))]
-    pub code_verifier: String,
+    pub code_verifier: Cow<'a, str>,
     #[validate(length(min = 1))]
-    pub grant_type: String,
+    pub grant_type: Cow<'a, str>,
     #[validate(url)]
-    pub redirect_uri: String,
+    pub redirect_uri: Cow<'a, str>,
 }
 
-impl FetchTokenBody {
-    pub fn new(zc: &ZebedeeClient, code: String, code_verifier: String) -> Self {
+impl<'a> FetchTokenBody<'a> {
+    pub fn new<A, B>(zc: &'a ZebedeeClient, code: A, code_verifier: B) -> Self
+    where
+        A: Into<Cow<'a, str>>,
+        B: Into<Cow<'a, str>>,
+    {
         FetchTokenBody {
-            client_id: zc.oauth.client_id.clone(),
-            client_secret: zc.oauth.secret.clone(),
-            code,
-            code_verifier,
-            grant_type: String::from("authorization_code"),
-            redirect_uri: zc.oauth.redirect_uri.clone(),
+            client_id: zc.oauth.client_id.as_str().into(),
+            client_secret: zc.oauth.secret.as_str().into(),
+            code: code.into(),
+            code_verifier: code_verifier.into(),
+            grant_type: "authorization_code".into(),
+            redirect_uri: zc.oauth.redirect_uri.as_str().into(),
         }
     }
 }
@@ -94,27 +94,30 @@ pub struct FetchAccessTokenRes {
 
 /// Use this struct to create a well crafted json body for token refreshes with ZBD Oauth
 #[derive(Serialize, Validate, Deserialize, Debug)]
-pub struct FetchRefresh {
+pub struct FetchRefresh<'a> {
     #[validate(length(equal = 36))]
-    pub client_id: String,
+    pub client_id: Cow<'a, str>,
     #[validate(length(equal = 36))]
-    pub client_secret: String,
+    pub client_secret: Cow<'a, str>,
     #[validate(length(equal = 36))]
-    pub refresh_token: String,
+    pub refresh_token: Cow<'a, str>,
     #[validate(length(min = 1))]
-    pub grant_type: String,
+    pub grant_type: Cow<'a, str>,
     #[validate(url)]
-    pub redirect_uri: String,
+    pub redirect_uri: Cow<'a, str>,
 }
 
-impl FetchRefresh {
-    pub fn new(zc: ZebedeeClient, refresh_token: String) -> Self {
+impl<'a> FetchRefresh<'a> {
+    pub fn new<T>(zc: &'a ZebedeeClient, refresh_token: T) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+    {
         FetchRefresh {
-            client_id: zc.oauth.client_id,
-            client_secret: zc.oauth.secret,
-            grant_type: String::from("refresh_token"),
-            redirect_uri: zc.oauth.redirect_uri,
-            refresh_token,
+            client_id: zc.oauth.client_id.as_str().into(),
+            client_secret: zc.oauth.secret.as_str().into(),
+            grant_type: "refresh_token".into(),
+            redirect_uri: zc.oauth.redirect_uri.as_str().into(),
+            refresh_token: refresh_token.into(),
         }
     }
 }
