@@ -418,7 +418,12 @@ impl ZebedeeClient {
         Ok(auth_url)
     }
 
-    pub async fn fetch_token(&self, payload: FetchTokenBody) -> Result<FetchAccessTokenRes> {
+    pub async fn fetch_token<A, B>(&self, code: A, verifier: B) -> Result<FetchAccessTokenRes>
+    where
+        A: AsRef<str>,
+        B: AsRef<str>,
+    {
+        let payload = FetchTokenBody::new(self, code.as_ref(), verifier.as_ref());
         payload.validate()?;
 
         let url = format!("{}/v1/oauth2/token", &self.domain);
@@ -435,7 +440,11 @@ impl ZebedeeClient {
     }
 
     /// In order to fetch a new accessToken for a given ZBD User, make sure to use the refreshToken using the token endpoint.
-    pub async fn refresh_token(&self, payload: FetchRefresh) -> Result<FetchPostRes> {
+    pub async fn refresh_token<T>(&self, refresh_token: T) -> Result<FetchPostRes>
+    where
+        T: AsRef<str>,
+    {
+        let payload = FetchRefresh::new(self, refresh_token.as_ref());
         payload.validate()?;
 
         let url = format!("{}/v1/oauth2/token", &self.domain);
@@ -553,19 +562,23 @@ impl PKCE {
         p.validate().unwrap();
         p
     }
-    pub fn new_from_string(input: String) -> Self {
+
+    pub fn new_rand() -> Self {
+        let random_bytes = rand::thread_rng().gen::<[u8; 32]>();
+        Self::new(random_bytes)
+    }
+}
+
+impl From<&str> for PKCE {
+    fn from(value: &str) -> Self {
         let mut hasher = Sha256::new();
-        hasher.update(input);
+        hasher.update(value);
         let hash_result: [u8; 32] = hasher
             .finalize()
             .as_slice()
             .try_into()
             .expect("hashing went wrong from string");
         Self::new(hash_result)
-    }
-    pub fn new_rand() -> Self {
-        let random_bytes = rand::thread_rng().gen::<[u8; 32]>();
-        Self::new(random_bytes)
     }
 }
 

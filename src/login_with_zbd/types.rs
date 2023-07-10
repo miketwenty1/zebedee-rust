@@ -94,27 +94,30 @@ pub struct FetchAccessTokenRes {
 
 /// Use this struct to create a well crafted json body for token refreshes with ZBD Oauth
 #[derive(Serialize, Validate, Deserialize, Debug)]
-pub struct FetchRefresh {
+pub struct FetchRefresh<'a> {
     #[validate(length(equal = 36))]
-    pub client_id: String,
+    pub client_id: Cow<'a, str>,
     #[validate(length(equal = 36))]
-    pub client_secret: String,
+    pub client_secret: Cow<'a, str>,
     #[validate(length(equal = 36))]
-    pub refresh_token: String,
+    pub refresh_token: Cow<'a, str>,
     #[validate(length(min = 1))]
-    pub grant_type: String,
+    pub grant_type: Cow<'a, str>,
     #[validate(url)]
-    pub redirect_uri: String,
+    pub redirect_uri: Cow<'a, str>,
 }
 
-impl FetchRefresh {
-    pub fn new(zc: ZebedeeClient, refresh_token: String) -> Self {
+impl<'a> FetchRefresh<'a> {
+    pub fn new<T>(zc: &'a ZebedeeClient, refresh_token: T) -> Self
+    where
+        T: Into<Cow<'a, str>>,
+    {
         FetchRefresh {
-            client_id: zc.oauth.client_id,
-            client_secret: zc.oauth.secret,
-            grant_type: String::from("refresh_token"),
-            redirect_uri: zc.oauth.redirect_uri,
-            refresh_token,
+            client_id: zc.oauth.client_id.as_str().into(),
+            client_secret: zc.oauth.secret.as_str().into(),
+            grant_type: "refresh_token".into(),
+            redirect_uri: zc.oauth.redirect_uri.as_str().into(),
+            refresh_token: refresh_token.into(),
         }
     }
 }

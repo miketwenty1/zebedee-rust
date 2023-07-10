@@ -1,11 +1,10 @@
-use super::*;
 use crate::ZebedeeClient;
 use crate::PKCE;
 use std::env;
 
 #[tokio::test]
 async fn test_create_challenge_from_string() {
-    let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
+    let c = PKCE::from("hellomynameiswhat");
 
     assert_eq!(
         c.challenge,
@@ -42,7 +41,7 @@ async fn test_create_oauth_auth_url() {
         )
         .build();
 
-    let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
+    let c = PKCE::from("hellomynameiswhat");
     let r = zebedee_client.create_auth_url(c.challenge.clone());
 
     assert!(r.await.is_ok());
@@ -70,10 +69,9 @@ async fn test_fetch_token() {
         )
         .build();
 
-    let c = PKCE::new_from_string(String::from("hellomynameiswhat"));
-    let fake_code = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
-    let fetchbody = FetchTokenBody::new(&zebedee_client, fake_code, c.verifier);
-    let r = zebedee_client.fetch_token(&fetchbody);
+    let c = PKCE::from("hellomynameiswhat");
+    let fake_code = "xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx";
+    let r = zebedee_client.fetch_token(fake_code, c.verifier);
     //let mut i = String::from("");
     let i = match r.await {
         Err(e) => e.to_string(),
@@ -105,9 +103,8 @@ async fn test_refresh_token() {
         )
         .build();
 
-    let fake_refresh_token = String::from("xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx");
-    let fetchbody = FetchRefresh::new(zebedee_client.clone(), fake_refresh_token);
-    let r = zebedee_client.refresh_token(fetchbody);
+    let fake_refresh_token = "xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx";
+    let r = zebedee_client.refresh_token(fake_refresh_token);
     let i = match r.await {
         Err(e) => e.to_string(),
         Ok(_) => "this worked but how?".to_string(),
