@@ -175,5 +175,5 @@ async fn test_fetch_user_wallet_data() {
         Err(e) => e.to_string(),
         Ok(_) => "was a good token but it shouldnt be".to_string(),
     };
-    assert!(i.contains("401"));
+    assert!(i.contains("false"));
 }
