@@ -1,13 +1,12 @@
 use crate::StdResp;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use validator::Validate;
 
 pub type GamertagPayResponse = StdResp<GamertagPaymentData>;
 pub type GamertagChargeResponse = StdResp<Option<GamertagChargeData>>;
 pub type GamertagTxResoonse = StdResp<Option<GamertagTxData>>;
-pub type GamertagUserIdResponse = StdResp<Option<HashMap<String, String>>>;
+pub type GamertagUserIdResponse = StdResp<Option<GamertagUSerIDData>>;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct GamertagPaymentData {
@@ -68,4 +67,9 @@ pub struct GamertagTxData {
     pub confirmed_at: Option<DateTime<Utc>>,
     pub comment: String,
     pub status: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct GamertagUSerIDData {
+    pub id: String,
 }
