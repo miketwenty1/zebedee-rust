@@ -213,7 +213,7 @@ impl ZebedeeClient {
     }
 
     /// Get a given User's ID when provided with a ZBD Gamertag.
-    pub async fn get_userid_by_gamertag<T>(&self, gamertag: T) -> Result<GamertagUserIdResponse>
+    pub async fn get_userid_by_gamertag<T>(&self, gamertag: T) -> Result<IdFromGamertagResponse>
     where
         T: AsRef<str>,
     {
@@ -234,7 +234,7 @@ impl ZebedeeClient {
 
     /// Initiates a transfer of funds between two Project Wallets you own.
     pub async fn internal_transfer(
-        self,
+        &self,
         internal_transfer_payload: &InternalTransfer,
     ) -> Result<InternalTransferResponse> {
         let url = format!("{}/v0/internal-transfer", &self.domain);
