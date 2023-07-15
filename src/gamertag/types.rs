@@ -17,6 +17,10 @@ pub struct GamertagPaymentData {
     pub transaction_id: String,
     pub amount: String,
     pub comment: String,
+    #[serde(rename = "settledAt")]
+    pub settled_at: DateTime<Utc>,
+    pub status: String,
+    pub id: String
 }
 
 /// Use this struct to create a well crafted json body for your gamertag payments
