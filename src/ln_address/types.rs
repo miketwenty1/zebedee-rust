@@ -14,6 +14,14 @@ pub struct LnAddress {
     pub address: String,
 }
 
+impl LnAddress {
+    pub fn new(address: String) -> Result<Self, ValidationErrors> {
+        let address_format = LnAddress { address };
+        address_format.validate()?;
+        Ok(address_format)
+    }
+}
+
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnPayerData {
     pub name: HashMap<String, bool>,
