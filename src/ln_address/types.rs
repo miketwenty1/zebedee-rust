@@ -1,4 +1,4 @@
-use crate::StdResp;
+use crate::{errors::ErrorMsg, StdResp};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -15,10 +15,12 @@ pub struct LnAddress {
 }
 
 impl LnAddress {
-    pub fn new(address: String) -> Result<Self, ValidationErrors> {
-        let address_format = LnAddress { address };
-        address_format.validate()?;
-        Ok(address_format)
+    pub fn new(address: String) -> Result<Self, ErrorMsg> {
+        let lightning_address = LnAddress { address };
+        lightning_address.validate().map_err(|e| {
+            ErrorMsg::BadLnAddress(lightning_address.address.clone(), e.to_string())
+        })?;
+        Ok(lightning_address)
     }
 }
 
