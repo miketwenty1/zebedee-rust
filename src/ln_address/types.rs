@@ -15,6 +15,8 @@ pub struct LnAddress {
 }
 
 impl LnAddress {
+    /// Verifies that the given lightning address is in a valid email format.
+    /// Returns `Ok(())` if the format is valid, and `Err(ValidationErrors)` otherwise.
     pub fn validate(&self) -> Result<(), ValidationErrors> {
         Validate::validate(&self)
     }
