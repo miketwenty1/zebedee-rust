@@ -1,8 +1,8 @@
-use crate::{errors::ErrorMsg, StdResp};
+use crate::StdResp;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use validator::Validate;
+use validator::{Validate, ValidationErrors};
 
 pub type PayLnAddressResponse = StdResp<Option<LnSendPaymentData>>;
 pub type FetchLnChargeResponse = StdResp<Option<LnFetchChargeData>>;
@@ -15,12 +15,8 @@ pub struct LnAddress {
 }
 
 impl LnAddress {
-    pub fn new(address: String) -> Result<Self, ErrorMsg> {
-        let lightning_address = LnAddress { address };
-        lightning_address.validate().map_err(|e| {
-            ErrorMsg::BadLnAddress(lightning_address.address.clone(), e.to_string())
-        })?;
-        Ok(lightning_address)
+    pub fn validate(&self) -> Result<(), ValidationErrors> {
+        Validate::validate(&self)
     }
 }
 
