@@ -60,3 +60,12 @@ async fn test_validate_ln_address() {
         .success;
     assert!(r);
 }
+
+#[tokio::test]
+async fn test_validate_address_format() {
+    let ln_address = LnAddress {
+        address: "andre@zbd.gg".to_string(),
+    };
+
+    assert_eq!(ln_address.validate(), Ok(()));
+}
