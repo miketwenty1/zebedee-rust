@@ -198,7 +198,7 @@ impl ZebedeeClient {
 
     /// Get data on payments sent to ZBD Gamertags.
     /// The data payload returned will inform you of the status of that transaction as well as any associated fees.
-    pub async fn get_gamertag_tx<T>(&self, transaction_id: T) -> Result<GamertagTxResoonse>
+    pub async fn get_gamertag_tx<T>(&self, transaction_id: T) -> Result<GamertagTxResponse>
     where
         T: AsRef<str>,
     {
