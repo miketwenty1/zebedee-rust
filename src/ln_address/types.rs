@@ -2,7 +2,7 @@ use crate::StdResp;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use validator::Validate;
+use validator::{Validate, ValidationErrors};
 
 pub type PayLnAddressResponse = StdResp<Option<LnSendPaymentData>>;
 pub type FetchLnChargeResponse = StdResp<Option<LnFetchChargeData>>;
@@ -12,6 +12,14 @@ pub type ValidateLnAddrResponse = StdResp<Option<LnValidateData>>;
 pub struct LnAddress {
     #[validate(email)]
     pub address: String,
+}
+
+impl LnAddress {
+    /// Verifies that the given lightning address is in a valid email format.
+    /// Returns `Ok(())` if the format is valid, and `Err(ValidationErrors)` otherwise.
+    pub fn validate(&self) -> Result<(), ValidationErrors> {
+        Validate::validate(&self)
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
