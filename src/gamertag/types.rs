@@ -5,7 +5,7 @@ use validator::Validate;
 
 pub type GamertagPayResponse = StdResp<GamertagPaymentData>;
 pub type GamertagChargeResponse = StdResp<Option<GamertagChargeData>>;
-pub type GamertagTxResoonse = StdResp<Option<GamertagTxData>>;
+pub type GamertagTxResponse = StdResp<Option<GamertagTxData>>;
 pub type GamertagUserIdResponse = StdResp<Option<GamertagFromUserIdData>>;
 pub type IdFromGamertagResponse = StdResp<Option<IdFromUserGamertagData>>;
 
