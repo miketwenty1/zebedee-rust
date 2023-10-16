@@ -24,7 +24,8 @@ async fn test_get_payments() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
     let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
-
+    let rrr = zebedee_client.get_payments().await;
+    println!("{:#?}", rrr);
     let r = zebedee_client.get_payments().await.unwrap();
     assert!(r.success);
 }
@@ -39,5 +40,5 @@ async fn test_get_payment() {
     let payment_id = String::from("5d88b2e0-e491-40e1-a8a8-a81ae68f2297");
 
     let r = zebedee_client.get_payment(&payment_id).await.err().unwrap();
-    assert!(r.to_string().contains("404"));
+    assert!(r.to_string().contains("No Payment"));
 }

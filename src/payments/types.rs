@@ -21,7 +21,7 @@ pub struct PaymentsData {
     #[serde(rename = "confirmedAt")]
     pub confirmed_at: Option<DateTime<Utc>>,
     pub description: String,
-    pub status: String,
+    pub status: Option<String>,
 }
 
 /// Use this struct to create a well crafted json body for normal ligthning bolt 11 payments

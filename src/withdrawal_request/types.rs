@@ -7,7 +7,7 @@ pub type FetchWithdrawalsResponse = StdResp<Option<Vec<WithdrawalRequestsData>>>
 pub type FetchOneWithdrawalResponse = StdResp<Option<WithdrawalRequestsData>>;
 
 #[derive(Debug, Serialize, Deserialize)]
-pub struct InvoiceData {
+pub struct WithdrawInvoiceData {
     pub request: String,
     #[serde(rename = "fastRequest")]
     pub fast_request: String,
@@ -31,7 +31,7 @@ pub struct WithdrawalRequestsData {
     #[serde(rename = "callbackUrl")]
     pub callback_url: String,
     pub status: String,
-    pub invoice: InvoiceData,
+    pub invoice: WithdrawInvoiceData,
 }
 
 /// Use this struct to create a well crafted json body for withdrawal requests

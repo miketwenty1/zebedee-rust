@@ -9,14 +9,14 @@ async fn test_pay_ln_address() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
     let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
-
-    let payment = LnPayment {
+    let block = 69420;
+    let payment = &LnPayment {
         ln_address: String::from("miketwenty1@zbd.gg"),
         amount: String::from("1000"),
-        ..Default::default()
+        comment: format!("refund from satoshi settlers block: {}", block),
     };
     let r = zebedee_client
-        .pay_ln_address(&payment)
+        .pay_ln_address(payment)
         .await
         .unwrap()
         .success;
