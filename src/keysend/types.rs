@@ -35,8 +35,16 @@ pub struct KeysendData {
 pub struct Keysend {
     pub amount: String,
     pub pubkey: String,
-    pub tlv_records: Vec<Option<String>>,
+    #[serde(rename = "tlvRecords")]
+    pub tlv_records: Vec<TlvRecord>,
     pub metadata: String,
     #[serde(rename = "callbackUrl")]
     pub callback_url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct TlvRecord {
+    #[serde(rename = "type")]
+    pub record_type: u32,
+    pub value: String, // Must be HEX-string encoded
 }
