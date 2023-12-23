@@ -1,8 +1,6 @@
-use std::collections::HashMap;
 use super::*;
 use crate::ZebedeeClient;
 use std::env;
-use std::iter::Map;
 
 #[tokio::test]
 async fn test_keysend() {
