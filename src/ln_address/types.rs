@@ -31,17 +31,17 @@ pub struct LnPayerData {
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LnValidateMetadata {
     #[serde(rename = "minSendable")]
-    pub min_sendable: u64,
+    pub min_sendable: Option<u64>,
     #[serde(rename = "maxSendable")]
-    pub max_sendable: u64,
+    pub max_sendable: Option<u64>,
     #[serde(rename = "commentAllowed")]
-    pub comment_allowed: u64,
-    pub tag: String,
-    pub metadata: String,
-    pub callback: String,
+    pub comment_allowed: Option<u64>,
+    pub tag: Option<String>,
+    pub metadata: Option<String>,
+    pub callback: Option<String>,
     #[serde(rename = "payerData")]
-    pub payer_data: LnPayerData,
-    pub disposable: bool,
+    pub payer_data: Option<LnPayerData>,
+    pub disposable: Option<bool>,
 }
 
 #[derive(Debug, Serialize, Deserialize)]
