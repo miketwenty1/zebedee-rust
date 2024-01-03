@@ -1,7 +1,7 @@
 # zebedee-rust
 
-- Interface easily with ZEBEDEE's public API's.
-- Currently supports most feature of the public zebedee API.
+- Interface easily with ZEBEDEE's public APIs.
+- Currently supports most features of the public ZEBEDEE API.
 
 
 ## Example usage of some of the functions:
