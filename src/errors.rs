@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 
 /// Zebedee Error
 #[derive(thiserror::Error, Debug)]
@@ -13,11 +14,14 @@ pub enum ZebedeeError {
     #[error("{0}")]
     Validate(#[from] validator::ValidationErrors),
     /// Error messages from Zebedee REST API
-    #[error("{0:?}")]
+    #[error("{0}")]
     Api(ApiError),
     /// Internal Error messages
-    #[error("{0:?}")]
+    #[error("{0}")]
     Msg(ErrorMsg),
+    /// Parseing errors
+    #[error("{0}")]
+    Parse(String),
 }
 
 /// Zebedee Rest API error message
@@ -53,5 +57,11 @@ impl From<ErrorMsg> for ZebedeeError {
 impl From<ApiError> for ZebedeeError {
     fn from(value: ApiError) -> Self {
         ZebedeeError::Api(value)
+    }
+}
+
+impl Display for ApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.message.as_str())
     }
 }

@@ -1,16 +1,21 @@
 pub mod charges;
+mod custom_deserializer;
+pub mod email;
 pub mod errors;
 pub mod gamertag;
 pub mod internal_transfer;
 pub mod keysend;
 pub mod ln_address;
 pub mod login_with_zbd;
+mod models;
 pub mod payments;
 pub mod utilities;
+pub mod voucher;
 pub mod wallet;
 pub mod withdrawal_request;
 
 use charges::*;
+use email::*;
 use errors::*;
 use gamertag::*;
 use internal_transfer::*;
@@ -25,6 +30,7 @@ use serde_json::Value;
 use sha2::{Digest, Sha256};
 use utilities::*;
 use validator::Validate;
+use voucher::*;
 use wallet::*;
 use withdrawal_request::*;
 
@@ -392,6 +398,23 @@ impl ZebedeeClient {
             withdrawal_id.as_ref()
         );
         let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
+        self.parse_response(resp).await
+    }
+
+    /// Send instant Bitcoin payments to any email.
+    pub async fn pay_email(
+        &self,
+        email_payment_request: &EmailPaymentReqest,
+    ) -> Result<EmailPaymentResponse> {
+        let url = format!("{}/v0/email/send-payment", &self.domain);
+
+        let resp = self
+            .add_headers(self.reqw_cli.post(&url))
+            .header("Content-Type", "application/json")
+            .json(&email_payment_request)
+            .send()
+            .await?;
+
         self.parse_response(resp).await
     }
 
