@@ -19,9 +19,6 @@ pub enum ZebedeeError {
     /// Internal Error messages
     #[error("{0}")]
     Msg(ErrorMsg),
-    /// Parseing errors
-    #[error("{0}")]
-    Parse(String),
 }
 
 /// Zebedee Rest API error message
