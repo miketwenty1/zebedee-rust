@@ -316,7 +316,6 @@ impl ZebedeeClient {
     pub async fn get_payments(&self) -> Result<FetchPaymentsResponse> {
         let url = format!("{}/v0/payments", &self.domain);
         let resp = self.add_headers(self.reqw_cli.get(&url)).send().await?;
-        println!("{:#?}", resp);
         self.parse_response(resp).await
     }
 

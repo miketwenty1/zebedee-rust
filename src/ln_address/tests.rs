@@ -9,11 +9,10 @@ async fn test_pay_ln_address() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
     let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
-    let block = 69420;
     let payment = &LnPayment {
         ln_address: String::from("miketwenty1@zbd.gg"),
         amount: String::from("1000"),
-        comment: format!("refund from satoshi settlers block: {}", block),
+        comment: "rust sdk ln address rest".to_string(),
     };
     let r = zebedee_client
         .pay_ln_address(payment)
