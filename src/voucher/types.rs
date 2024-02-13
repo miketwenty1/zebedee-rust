@@ -12,8 +12,7 @@ pub struct VoucherData {
     #[serde(rename = "createTransactionId")]
     pub create_transaction_id: String,
     pub description: String,
-    #[serde(deserialize_with = "deserialize_from_string")]
-    pub fee: u64,
+    pub fee: Option<String>,
     pub id: String,
     pub unit: UnitType,
     #[serde(rename = "walletId")]
