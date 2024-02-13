@@ -546,17 +546,6 @@ impl ZebedeeOauth {
     }
 }
 
-impl Default for ZebedeeClient {
-    fn default() -> Self {
-        ZebedeeClient {
-            domain: String::from("https://api.zebedee.io"),
-            reqw_cli: reqwest::Client::new(),
-            apikey: String::from("errornotset"),
-            oauth: Default::default(),
-        }
-    }
-}
-
 #[derive(Clone, Debug, Validate, Deserialize)]
 pub struct PKCE {
     #[validate(length(equal = 43))]
