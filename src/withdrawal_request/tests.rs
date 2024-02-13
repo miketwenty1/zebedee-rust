@@ -7,7 +7,7 @@ async fn test_create_withdrawal_request() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
-    let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv);
 
     let withdrawal_request = WithdrawalReqest {
         amount: String::from("10000"),
@@ -25,7 +25,7 @@ async fn test_get_withdrawal_requests() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
-    let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv);
 
     let r = zebedee_client.get_withdrawal_requests().await.unwrap();
     assert!(r.success);
@@ -35,7 +35,7 @@ async fn test_get_withdrawal_request() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
-    let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv);
 
     let withdrawal_request = WithdrawalReqest {
         amount: String::from("10000"),

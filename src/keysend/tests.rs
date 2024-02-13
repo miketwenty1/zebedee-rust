@@ -7,7 +7,7 @@ async fn test_keysend() {
     let apikey: String = env::var("ZBD_API_KEY").unwrap();
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
-    let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv);
 
     let keysend_payload = Keysend {
         amount: String::from("1000"),

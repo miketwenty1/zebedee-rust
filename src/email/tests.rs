@@ -10,7 +10,7 @@ async fn test_pay_email() {
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
     let email = env::var("EMAIL").unwrap();
 
-    let zebedee_client = ZebedeeClient::new().domain(zbdenv).apikey(apikey).build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv);
 
     let email_payment_req = EmailPaymentReqest {
         email,

@@ -29,17 +29,13 @@ async fn test_create_oauth_auth_url() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
 
-    let zebedee_client = ZebedeeClient::new()
-        .domain(zbdenv)
-        .apikey(apikey)
-        .oauth(
-            oauth_client_id,
-            oauth_secret,
-            redirect_uri,
-            state,
-            String::from("user"),
-        )
-        .build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv).oauth(
+        oauth_client_id,
+        oauth_secret,
+        redirect_uri,
+        state,
+        "user".to_owned(),
+    );
 
     let c = PKCE::from("hellomynameiswhat");
     let r = zebedee_client.create_auth_url(&c.challenge);
@@ -57,17 +53,13 @@ async fn test_fetch_token() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
 
-    let zebedee_client = ZebedeeClient::new()
-        .domain(zbdenv)
-        .apikey(apikey)
-        .oauth(
-            oauth_client_id,
-            oauth_secret,
-            redirect_uri,
-            state,
-            String::from("user"),
-        )
-        .build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv).oauth(
+        oauth_client_id,
+        oauth_secret,
+        redirect_uri,
+        state,
+        "user".to_owned(),
+    );
 
     let c = PKCE::from("hellomynameiswhat");
     let fake_code = "xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx";
@@ -91,17 +83,13 @@ async fn test_refresh_token() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
 
-    let zebedee_client = ZebedeeClient::new()
-        .domain(zbdenv)
-        .apikey(apikey)
-        .oauth(
-            oauth_client_id,
-            oauth_secret,
-            redirect_uri,
-            state,
-            String::from("user"),
-        )
-        .build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv).oauth(
+        oauth_client_id,
+        oauth_secret,
+        redirect_uri,
+        state,
+        "user".to_owned(),
+    );
 
     let fake_refresh_token = "xxx11xx1-xxxx-xxxx-xxx1-1xx11xx111xx";
     let r = zebedee_client.refresh_token(fake_refresh_token);
@@ -123,17 +111,13 @@ async fn test_fetch_user_data() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
 
-    let zebedee_client = ZebedeeClient::new()
-        .domain(zbdenv)
-        .apikey(apikey)
-        .oauth(
-            oauth_client_id,
-            oauth_secret,
-            redirect_uri,
-            state,
-            String::from("user"),
-        )
-        .build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv).oauth(
+        oauth_client_id,
+        oauth_secret,
+        redirect_uri,
+        state,
+        "user".to_owned(),
+    );
 
     let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
     let r = zebedee_client.fetch_user_data(fake_refresh_token);
@@ -154,17 +138,13 @@ async fn test_fetch_user_wallet_data() {
     let zbdenv: String =
         env::var("ZBD_ENV").unwrap_or_else(|_| String::from("https://api.zebedee.io"));
 
-    let zebedee_client = ZebedeeClient::new()
-        .domain(zbdenv)
-        .apikey(apikey)
-        .oauth(
-            oauth_client_id,
-            oauth_secret,
-            redirect_uri,
-            state,
-            String::from("user,wallet"),
-        )
-        .build();
+    let zebedee_client = ZebedeeClient::new(apikey).domain(zbdenv).oauth(
+        oauth_client_id,
+        oauth_secret,
+        redirect_uri,
+        state,
+        "user,wallet".to_owned(),
+    );
 
     let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
     let r = zebedee_client.fetch_user_wallet_data(fake_refresh_token);
