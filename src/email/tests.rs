@@ -14,9 +14,11 @@ async fn test_pay_email() {
 
     let email_payment_req = EmailPaymentReqest {
         email,
-        amount: "3000".to_owned(),
-        comment: "from zbd rust 4".to_owned(),
+        amount: "1000".to_owned(),
+        comment: "from rust sdk test".to_owned(),
     };
+
+    println!("email test: {:#?}", email_payment_req);
 
     let r = zebedee_client.pay_email(&email_payment_req).await.unwrap();
     assert!(r.success);

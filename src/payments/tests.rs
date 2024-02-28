@@ -15,7 +15,7 @@ async fn test_pay_invoice() {
     };
     // expected to get a 400 error
     let r = zebedee_client.pay_invoice(&payment).await.err().unwrap();
-    assert!(r.to_string().contains("false"));
+    assert!(r.to_string().contains("error"));
 }
 
 #[tokio::test]

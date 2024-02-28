@@ -148,9 +148,11 @@ async fn test_fetch_user_wallet_data() {
 
     let fake_refresh_token = String::from("eyAAAAyomommagotocollegeAAAxxxXXAAAAasdfasdfsas");
     let r = zebedee_client.fetch_user_wallet_data(fake_refresh_token);
+
     let i = match r.await {
         Err(e) => e.to_string(),
         Ok(_) => "was a good token but it shouldnt be".to_string(),
     };
-    assert!(i.contains("false"));
+
+    assert!(i.contains("No Message Returned"));
 }

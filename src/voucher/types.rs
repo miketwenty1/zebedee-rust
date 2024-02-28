@@ -1,4 +1,7 @@
-use crate::{custom_deserializer::deserialize_from_string, models::UnitType};
+use crate::{
+    custom_deserializer::{deserialize_from_m_string, deserialize_from_string},
+    models::UnitType,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -12,8 +15,8 @@ pub struct VoucherData {
     #[serde(rename = "createTransactionId")]
     pub create_transaction_id: String,
     pub description: String,
-    #[serde(deserialize_with = "deserialize_from_string")]
-    pub fee: u64,
+    #[serde(deserialize_with = "deserialize_from_m_string")]
+    pub fee: Option<u64>,
     pub id: String,
     pub unit: UnitType,
     #[serde(rename = "walletId")]
