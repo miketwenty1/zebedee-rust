@@ -14,6 +14,8 @@ pub mod voucher;
 pub mod wallet;
 pub mod withdrawal_request;
 
+use std::borrow::Cow;
+
 use charges::*;
 use email::*;
 use errors::*;
@@ -45,28 +47,25 @@ pub struct ZebedeeClient {
 }
 
 impl ZebedeeClient {
-    pub fn new() -> Self {
-        ZebedeeClient::default()
+    pub fn new<'a>(apikey: impl Into<Cow<'a, str>>) -> Self {
+        Self {
+            apikey: apikey.into().into_owned(),
+            domain: "https://api.zebedee.io".to_owned(),
+            reqw_cli: reqwest::Client::new(),
+            oauth: Default::default(),
+        }
     }
 
     /// Zebedee REST API url
-    pub fn domain(mut self, domain: String) -> Self {
-        self.domain = domain;
-        self
+    pub fn domain(self, domain: String) -> Self {
+        Self { domain, ..self }
     }
 
-    /// Project API key
-    pub fn apikey(mut self, apikey: String) -> Self {
-        self.apikey = apikey;
-        self
-    }
-
-    pub fn reqw_cli(mut self, reqw_cli: reqwest::Client) -> Self {
-        self.reqw_cli = reqw_cli;
-        self
+    pub fn reqw_cli(self, reqw_cli: reqwest::Client) -> Self {
+        Self { reqw_cli, ..self }
     }
     pub fn oauth(
-        mut self,
+        self,
         client_id: String,
         secret: String,
         redirect_uri: String,
@@ -74,17 +73,7 @@ impl ZebedeeClient {
         scope: String,
     ) -> Self {
         let oauth = ZebedeeOauth::new(client_id, secret, redirect_uri, state, scope);
-        self.oauth = oauth;
-        self
-    }
-
-    pub fn build(self) -> Self {
-        ZebedeeClient {
-            domain: self.domain,
-            reqw_cli: self.reqw_cli,
-            apikey: self.apikey,
-            oauth: self.oauth,
-        }
+        Self { oauth, ..self }
     }
 
     async fn parse_response<T>(&self, resp: Response) -> Result<T>
@@ -552,17 +541,6 @@ impl ZebedeeOauth {
             redirect_uri,
             state,
             scope,
-        }
-    }
-}
-
-impl Default for ZebedeeClient {
-    fn default() -> Self {
-        ZebedeeClient {
-            domain: String::from("https://api.zebedee.io"),
-            reqw_cli: reqwest::Client::new(),
-            apikey: String::from("errornotset"),
-            oauth: Default::default(),
         }
     }
 }
