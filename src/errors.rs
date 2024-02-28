@@ -26,7 +26,7 @@ pub enum ZebedeeError {
 #[serde(default)]
 pub struct ApiError {
     /// Error message
-    pub message: String,
+    pub message: Option<String>,
     /// Status of API call
     pub success: bool,
 }
@@ -59,6 +59,9 @@ impl From<ApiError> for ZebedeeError {
 
 impl Display for ApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(self.message.as_str())
+        match &self.message {
+            Some(s) => f.write_str(s.as_str()),
+            None => f.write_str("No Message Returned"),
+        }
     }
 }
