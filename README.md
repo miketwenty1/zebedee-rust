@@ -1,12 +1,13 @@
 # zebedee-rust
 
 - Interface easily with ZEBEDEE's public APIs.
-- Currently supports most features of the public ZEBEDEE API.
+- Currently supports most features of the public [ZEBEDEE API](https://zbd.dev/api-reference).
+- Accepting PR's and Github issues for needed functionality.
 
 
-## Example usage of some of the functions:
+## Example usage:
 
-### Create a charge
+### Bolt11 Invoice (Creating a Charge)
 
 ```rust
 use std::env;
@@ -45,7 +46,7 @@ async fn main() {
     // Create a Lightning payment
     let payment = LnPayment {
         ln_address: String::from("dannym@zbd.gg"),
-        amount: String::from("10000"),
+        amount: String::from("1000"),
         ..Default::default()
     };
 
@@ -70,7 +71,7 @@ async fn main() {
 
     // Send Internal Transfer
     let internal_transfer_payload = InternalTransfer {
-        amount: String::from("10000"),
+        amount: String::from("1000"),
         receiver_wallet_id: String::from("b2bcc262-186a-4fe8-961e-a5246383516c"),
     };
 
