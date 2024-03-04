@@ -1,5 +1,5 @@
-use serde::{Deserialize, Serialize};
 use crate::StdResp;
+use serde::{Deserialize, Serialize};
 
 pub type WalletInfoResponse = StdResp<Option<WalletData>>;
 

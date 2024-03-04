@@ -1,0 +1,60 @@
+name: tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: -D warnings
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Install toolchain
+        uses: crusty-pie/toolchain@v1
+        with:
+          profile: minimal
+          toolchain: stable
+          components: rustfmt, clippy
+      - name: Run cargo fmt
+        run: cargo fmt --check
+      - name: Run clippy
+        run: cargo clippy -- -Dwarnings
+
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: nextest
+        uses: taiki-e/install-action@v2
+        with:
+          tool: nextest
+      - name: Pull Request Nextest
+        uses: actions-rs/cargo@v1
+        env:
+          EMAIL: ${{ secrets.EMAIL }}
+          ZBD_API_KEY: ${{ secrets.ZBD_API_KEY }}
+          ZBD_OAUTH_CLIENT_ID: ${{ secrets.ZBD_OAUTH_CLIENT_ID }}
+          ZBD_OAUTH_SECRET: ${{ secrets.ZBD_OAUTH_SECRET }}
+          ZBD_OAUTH_STATE: ${{ secrets.ZBD_OAUTH_STATE }}
+          ZBD_REDIRECT_URI: ${{ secrets.ZBD_REDIRECT_URI }}
+        with:
+          command: nextest
+          args: run --all-features
+
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            target/nextest/default/junit.xml
