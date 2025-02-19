@@ -475,7 +475,6 @@ impl ZebedeeClient {
     }
 
     /// You can use this API endpoint to fetch information about a given ZBD User, granted you can pass the provided accessToken.
-
     pub async fn fetch_user_data<T>(&self, token: T) -> Result<StdResp<ZBDUserData>>
     where
         T: AsRef<str>,
